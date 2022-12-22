@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Position {
     current_position: u64,
     mask: u64,
@@ -166,5 +166,23 @@ impl Position {
 
     pub fn column_mask(col: i32) -> u64 {
         return ((1 << Position::HEIGHT) - 1) << col * (Position::HEIGHT + 1);
+    }
+
+    pub fn to_string(&self) -> String {
+        let mut s = String::new();
+        for row in (0..Position::HEIGHT).rev() {
+            for col in 0..Position::WIDTH {
+                let mask = 1 << (row * 7 + col);
+                if self.mask & mask == 0 {
+                    s.push('.');
+                } else if self.current_position & mask != 0 {
+                    s.push(if self.moves % 2 == 0 { 'X' } else { 'O' });
+                } else {
+                    s.push(if self.moves % 2 == 0 { 'O' } else { 'X' });
+                }
+            }
+            s.push('\n');
+        }
+        return s
     }
 }
