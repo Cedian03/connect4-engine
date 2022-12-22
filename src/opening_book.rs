@@ -41,7 +41,7 @@ impl OpeningBook {
         assert!(log_size <= 40);
 
         let size = next_prime(1 << log_size as u64) as usize;
-        let mut_size = self.table.get_size();
+        let mut_size = self.table.get_mut_size();
         *mut_size = size;
 
         let mut keys_buf: Vec<u8> = vec![0u8; size * key_size];

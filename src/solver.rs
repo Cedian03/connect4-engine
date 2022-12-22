@@ -15,7 +15,7 @@ impl Solver {
         let mut column_order: [i32; Position::WIDTH as usize] = [0; Position::WIDTH as usize];
 
         for i in 0..Position::WIDTH {
-            column_order[i as usize] = Position::WIDTH/2 - (i+1)*(i%2*2-1)/2
+            column_order[i as usize] = Position::WIDTH / 2 - (i + 1)*(i % 2 * 2 - 1) / 2
         }
 
         return Solver { node_count: 0, column_order, table: TranspositionTable::new(Solver::TABLE_SIZE), book: OpeningBook::new(Position::WIDTH, Position::HEIGHT) }
@@ -24,22 +24,22 @@ impl Solver {
     const TABLE_SIZE: u8 = 24;
     const INVALID_MOVE: i32 = -1000;
 
-    fn negamax(&mut self, p: &Position, mut alpha: i32, mut beta: i32) -> i32 {
+    fn negamax(&mut self, position: &Position, mut alpha: i32, mut beta: i32) -> i32 {
         assert!(alpha < beta);
-        assert!(!p.can_win_next()); 
+        assert!(!position.can_win_next()); 
 
         self.node_count += 1;
 
-        let possible: u64 = p.possible_non_losing_moves();
+        let possible: u64 = position.possible_non_losing_moves();
         if possible == 0 {
-            return -(Position::WIDTH * Position::HEIGHT - p.nb_moves()) / 2;
+            return -(Position::WIDTH * Position::HEIGHT - position.nb_moves()) / 2;
         }
 
-        if p.nb_moves() >= Position::WIDTH * Position::HEIGHT - 2 {
+        if position.nb_moves() >= Position::WIDTH * Position::HEIGHT - 2 {
             return 0;
         }
 
-        let mut min: i32 = -(Position::WIDTH * Position::HEIGHT - 2 - p.nb_moves())/2;
+        let mut min: i32 = -(Position::WIDTH * Position::HEIGHT - 2 - position.nb_moves())/2;
         if alpha < min {
             alpha = min;
             if alpha >= beta {
@@ -47,7 +47,7 @@ impl Solver {
             }
         }
 
-        let mut max: i32 = (Position::WIDTH * Position::HEIGHT - 1 - p.nb_moves())/2;
+        let mut max: i32 = (Position::WIDTH * Position::HEIGHT - 1 - position.nb_moves())/2;
         if beta > max {
             beta = max;
             if alpha >= beta {
@@ -55,7 +55,7 @@ impl Solver {
             }
         }
 
-        if let Some(val) = self.book.get(&p) {
+        if let Some(val) = self.book.get(&position) {
             if val == 0 {
                 dbg!(val); 
             } else {
@@ -63,7 +63,7 @@ impl Solver {
             }
         }
         
-        let key: u64 = p.key();
+        let key: u64 = position.key();
         if let Some(val) = self.table.get(key) {
             if val == 0 { // !?!?!?!!?
                 dbg!(val);
@@ -92,12 +92,12 @@ impl Solver {
         for i in (0..Position::WIDTH).rev() {
             let m: u64 = possible & Position::column_mask(self.column_order[i as usize]);
             if m != 0 {
-                moves.add(m, p.move_score(m));
+                moves.add(m, position.move_score(m));
             }
         }
 
         while let Some(next) = moves.get_next() {
-            let mut p2: Position = p.clone();
+            let mut p2: Position = position.clone();
             p2.play(next);
             let score: i32 = -self.negamax(&p2, -beta, -alpha);
 
@@ -115,13 +115,13 @@ impl Solver {
         return alpha;
     }
 
-    pub fn solve(&mut self, p: &Position, strong: bool) -> i32 {
-        if p.can_win_next() {
-            return (Position::WIDTH*Position::HEIGHT + 1 - p.nb_moves()) / 2;
+    pub fn solve(&mut self, position: &Position, strong: bool) -> i32 {
+        if position.can_win_next() {
+            return (Position::WIDTH*Position::HEIGHT + 1 - position.nb_moves()) / 2;
         }
 
-        let mut min = -(Position::WIDTH*Position::HEIGHT - p.nb_moves()) / 2;
-        let mut max = (Position::WIDTH*Position::HEIGHT + 1 - p.nb_moves()) / 2;
+        let mut min = -(Position::WIDTH*Position::HEIGHT - position.nb_moves()) / 2;
+        let mut max = (Position::WIDTH*Position::HEIGHT + 1 - position.nb_moves()) / 2;
 
         if !strong {
             min = -1;
@@ -136,7 +136,7 @@ impl Solver {
                 med = max / 2
             }
 
-            let r = self.negamax(p, med, med + 1);
+            let r = self.negamax(position, med, med + 1);
             if r <= med {
                 max = r
             } else {
@@ -146,20 +146,34 @@ impl Solver {
         return min
     } 
 
-    pub fn analyze(&mut self, p: &Position, strong: bool) -> Vec<i32> {
+    pub fn analyze(&mut self, position: &Position, strong: bool) -> Vec<i32> {
         let mut scores: Vec<i32> = vec![Solver::INVALID_MOVE; Position::WIDTH as usize]; 
         for col in 0..Position::WIDTH {
-            if p.can_play(col) {
-                if p.is_winning_move(col) {
-                    scores[col as usize] = (Position::WIDTH * Position::HEIGHT + 1 - p.nb_moves()) / 2;
+            if position.can_play(col) {
+                if position.is_winning_move(col) {
+                    scores[col as usize] = (Position::WIDTH * Position::HEIGHT + 1 - position.nb_moves()) / 2;
                 } else {
-                    let mut p2: Position = p.clone();
+                    let mut p2: Position = position.clone();
                     p2.play_col(col);
                     scores[col as usize] = -self.solve(&p2, strong); 
                 }
             }
         }
         return scores; 
+    }
+
+    pub fn play(&mut self, position: &mut Position) {
+        let mut max = i32::MIN;
+        let mut col = -1;
+
+        for (index, &x) in self.analyze(position, true).iter().enumerate() {
+            if x > max {
+                max = x;
+                col = index as i32;
+            }
+        }
+
+        position.play_col(col); 
     }
 
     pub fn get_node_count(&self) -> u64 {

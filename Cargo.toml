@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 num = "0.4.0"
+clap = { version = "4.0", features = ["derive"] }
+console = "0.15.2"

@@ -1,77 +1,72 @@
-use position::Position;
-use solver::Solver;
-
-mod position;
 mod solver;
-mod transposition_table;
+mod position;
 mod move_sorter;
 mod opening_book;
+mod transposition_table;
+
+use solver::Solver;
+use position::Position;
+use position::GameState;
+
+use clap::Parser;
+use console::Term;
+
+#[derive(Parser)]
+struct Args {
+    #[arg(short = 'x', long = "x_is_human")]
+    x_is_human: bool,
+    #[arg(short = 'o', long = "o_is_human")]
+    o_is_human: bool,
+}
+
+fn human_play(position: &mut Position) {
+    let term = Term::stdout();
+    let mut input = String::new();
+
+    loop {
+        term.write_line("Enter your move (1-7):");
+        input = term.read_line().unwrap();
+
+        if let Ok(col) = input.trim().parse::<i32>() {
+            if col >= 1 && col <= 7 {
+                position.play_col(col - 1);
+                break;
+            } else {
+                println!("Invalid input: {} (out of range)", input);
+            }
+        } else {
+            println!("Invalid input: {} (not a number)", input);
+        }
+    }
+}
 
 fn main() {
+    let args = Args::parse();
+
     let mut position = Position::new(); 
     let mut solver = Solver::new();
 
-    let seq = std::env::args().nth(1).expect("no seq"); 
+    solver.load_book(".book");
 
-    position.play_seq(&seq); 
-    solver.load_book(".book"); 
+    while position.game_state == GameState::InProgress {
+        println!("{}", position); 
+        println!("{:?}", solver.analyze(&position, true));
 
-    println!("{:?}", solver.analyze(&position, true)); 
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    use std::io::Write;
-    use std::time::Instant;
-    use std::fs;
-    use std::io;
-
-    fn foo(bench_path: &str) {
-        let f = fs::read_to_string(bench_path).expect("Failed to open benchmark file");
-        let mut s = Solver::new();
-        s.load_book("7x6.book"); 
-    
-        for i in f.lines() {
-            let mut p = Position::new();
-            let mut split = i.split(" ");
-            let seq = split.next().unwrap();
-            let exp = split.next().unwrap().parse::<i32>().unwrap();
-            
-            p.play_seq(seq); 
-            assert_eq!(exp, s.solve(&p, true)); 
+        if position.nb_moves() % 2 == 0 {
+            if args.x_is_human {
+                human_play(&mut position)
+            } else {
+                solver.play(&mut position)
+            }
+        } else {
+            if args.o_is_human {
+                human_play(&mut position)
+            } else {
+                solver.play(&mut position)
+            }
         }
     }
-    
-    #[test]
-    fn test_L3_R1() {
-        foo("benchmarks/Test_L3_R1")
-    }
-    
-    #[test]
-    fn test_L2_R1() {
-        foo("benchmarks/Test_L2_R1")
-    }
-    
-    #[test]
-    fn test_L2_R2() {
-        foo("benchmarks/Test_L2_R2")
-    }
-    
-    #[test]
-    fn test_L1_R1() {
-        foo("benchmarks/Test_L1_R1")
-    }
-    
-    #[test]
-    fn test_L1_R2() {
-        foo("benchmarks/Test_L1_R2")
-    }
-    
-    #[test]
-    fn test_L1_R3() {
-        foo("benchmarks/Test_L1_R3")
-    }
+    println!("{:?}", position.game_state);
+    println!("{}", position);
 }
 

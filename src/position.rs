@@ -1,13 +1,29 @@
+use std::fmt;
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum EndState {
+    WinnerX,
+    WinnerO,
+    Draw,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum GameState {
+    InProgress,
+    Ended(EndState)
+}
+
 #[derive(Clone, Debug)]
 pub struct Position {
     current_position: u64,
     mask: u64,
-    moves: i32
+    moves: i32,
+    pub game_state: GameState,
 }
 
 impl Position {
     pub fn new() -> Self {
-        return Position { current_position: 0, mask: 0, moves: 0 }
+        return Position { current_position: 0, mask: 0, moves: 0, game_state: GameState::InProgress }
     }
     
     pub const WIDTH: i32 = 7;
@@ -172,17 +188,26 @@ impl Position {
         let mut s = String::new();
         for row in (0..Position::HEIGHT).rev() {
             for col in 0..Position::WIDTH {
-                let mask = 1 << (row * 7 + col);
-                if self.mask & mask == 0 {
-                    s.push('.');
-                } else if self.current_position & mask != 0 {
-                    s.push(if self.moves % 2 == 0 { 'X' } else { 'O' });
+                let mask = 1 << (col * 7 + row);
+                if self.mask & mask != 0 {
+                    if self.current_position & mask != 0 {
+                        s.push(if self.moves % 2 == 0 { 'X' } else { 'O' });
+                    } else {
+                        s.push(if self.moves % 2 == 0 { 'O' } else { 'X' });
+                    }   
                 } else {
-                    s.push(if self.moves % 2 == 0 { 'O' } else { 'X' });
+                    s.push('.');
                 }
+                s.push(' ')
             }
             s.push('\n');
         }
         return s
+    }
+}
+
+impl fmt::Display for Position {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.to_string())
     }
 }

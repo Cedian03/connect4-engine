@@ -42,11 +42,6 @@ pub struct TranspositionTable<T: Integer> {
 }
 
 impl<T: Integer> TranspositionTable<T> {
-    // pub fn new(log_size: u8) -> Self {
-    //     let size: usize = next_prime(1 << log_size) as usize;
-    //     return TranspositionTable { keys: vec![num::zero(); size], vals: vec![0; size], size };
-    // }
-
     const fn index(&self, key: u64) -> usize {
         return (key as usize) % self.size
     }
@@ -63,7 +58,7 @@ impl<T: Integer> TranspositionTable<T> {
         return &mut self.vals;  
     }
 
-    pub fn get_size(&mut self) -> &mut usize {
+    pub fn get_mut_size(&mut self) -> &mut usize {
         return &mut self.size; 
     }
 }
