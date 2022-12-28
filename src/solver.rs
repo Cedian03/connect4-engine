@@ -3,6 +3,11 @@ use crate::position::Position;
 use crate::move_sorter::MoveSorter;
 use crate::transposition_table::*;
 
+#[derive(Clone)]
+pub enum Score {
+    Valid(i32),
+    Invalid
+}
 pub struct Solver {
     node_count: u64,    
     column_order: [i32; Position::WIDTH as usize],
@@ -22,7 +27,6 @@ impl Solver {
     }
 
     const TABLE_SIZE: u8 = 24;
-    const INVALID_MOVE: i32 = -1000;
 
     fn negamax(&mut self, position: &Position, mut alpha: i32, mut beta: i32) -> i32 {
         assert!(alpha < beta);
@@ -39,7 +43,7 @@ impl Solver {
             return 0;
         }
 
-        let mut min: i32 = -(Position::WIDTH * Position::HEIGHT - 2 - position.nb_moves())/2;
+        let mut min: i32 = -(Position::WIDTH * Position::HEIGHT - 2 - position.nb_moves()) / 2;
         if alpha < min {
             alpha = min;
             if alpha >= beta {
@@ -47,7 +51,7 @@ impl Solver {
             }
         }
 
-        let mut max: i32 = (Position::WIDTH * Position::HEIGHT - 1 - position.nb_moves())/2;
+        let mut max: i32 = (Position::WIDTH * Position::HEIGHT - 1 - position.nb_moves()) / 2;
         if beta > max {
             beta = max;
             if alpha >= beta {
@@ -65,24 +69,20 @@ impl Solver {
         
         let key: u64 = position.key();
         if let Some(val) = self.table.get(key) {
-            if val == 0 { // !?!?!?!!?
-                dbg!(val);
-            } else {
-                if val as i32 > Position::MAX_SCORE - Position::MIN_SCORE + 1 {
-                    min = val as i32 + 2 * Position::MIN_SCORE - Position::MAX_SCORE - 2; 
-                    if alpha < min {
-                        alpha = min; 
-                        if alpha >= beta {
-                            return alpha;
-                        }
+            if val as i32 > Position::MAX_SCORE - Position::MIN_SCORE + 1 {
+                min = val as i32 + 2 * Position::MIN_SCORE - Position::MAX_SCORE - 2; 
+                if alpha < min {
+                    alpha = min; 
+                    if alpha >= beta {
+                        return alpha;
                     }
-                } else {
-                    max = val as i32 + Position::MIN_SCORE - 1;
-                    if beta > max {
-                        beta = max; 
-                        if alpha >= beta {
-                            return beta;
-                        }
+                }
+            } else {
+                max = val as i32 + Position::MIN_SCORE - 1;
+                if beta > max {
+                    beta = max; 
+                    if alpha >= beta {
+                        return beta;
                     }
                 }
             }
@@ -146,34 +146,40 @@ impl Solver {
         return min
     } 
 
-    pub fn analyze(&mut self, position: &Position, strong: bool) -> Vec<i32> {
-        let mut scores: Vec<i32> = vec![Solver::INVALID_MOVE; Position::WIDTH as usize]; 
+    pub fn analyze(&mut self, position: &Position, strong: bool) -> Vec<Score> {
+        let mut scores: Vec<Score> = vec![Score::Invalid; Position::WIDTH as usize]; 
         for col in 0..Position::WIDTH {
             if position.can_play(col) {
                 if position.is_winning_move(col) {
-                    scores[col as usize] = (Position::WIDTH * Position::HEIGHT + 1 - position.nb_moves()) / 2;
+                    let score = (Position::WIDTH * Position::HEIGHT + 1 - position.nb_moves()) / 2; 
+                    scores[col as usize] = Score::Valid(score);
                 } else {
-                    let mut p2: Position = position.clone();
-                    p2.play_col(col);
-                    scores[col as usize] = -self.solve(&p2, strong); 
+                    let mut position_2: Position = position.clone();
+                    position_2.play_col(col);
+                    let score = -self.solve(&position_2, strong);
+                    scores[col as usize] = Score::Valid(score)
                 }
             }
         }
         return scores; 
     }
 
-    pub fn play(&mut self, position: &mut Position) {
+    pub fn play(&mut self, position: &mut Position) -> bool {
         let mut max = i32::MIN;
         let mut col = -1;
 
-        for (index, &x) in self.analyze(position, true).iter().enumerate() {
-            if x > max {
-                max = x;
-                col = index as i32;
+        for (index, score) in self.analyze(position, true).iter().enumerate() {
+            if let Score::Valid(score) = score {
+                if score > &max {
+                    max = *score;
+                    col = index as i32;
+                } 
             }
         }
 
+        let res = position.is_winning_move(col);
         position.play_col(col); 
+        res
     }
 
     pub fn get_node_count(&self) -> u64 {

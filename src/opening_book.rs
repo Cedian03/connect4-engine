@@ -20,7 +20,6 @@ impl OpeningBook {
 
     pub fn load(&mut self, path: &str) -> io::Result<()> {
         self.depth = -1;
-        // delete T;
         let mut f = File::open(path).expect("Failed to open file");
 
         let mut meta_buf = [0u8; 6];

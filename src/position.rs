@@ -1,16 +1,8 @@
-use std::fmt;
+use std::{fmt, iter::Zip};
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum EndState {
-    WinnerX,
-    WinnerO,
-    Draw,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub enum GameState {
-    InProgress,
-    Ended(EndState)
+pub enum Stone {
+    X,
+    O,
 }
 
 #[derive(Clone, Debug)]
@@ -18,18 +10,17 @@ pub struct Position {
     current_position: u64,
     mask: u64,
     moves: i32,
-    pub game_state: GameState,
 }
 
 impl Position {
     pub fn new() -> Self {
-        return Position { current_position: 0, mask: 0, moves: 0, game_state: GameState::InProgress }
+        return Position { current_position: 0, mask: 0, moves: 0 }
     }
     
     pub const WIDTH: i32 = 7;
     pub const HEIGHT: i32 = 6;
 
-    pub const MIN_SCORE: i32 = -(Position::WIDTH*Position::HEIGHT)/ 2 + 3;
+    pub const MIN_SCORE: i32 = -(Position::WIDTH*Position::HEIGHT) / 2 + 3;
     pub const MAX_SCORE: i32 = ((Position::WIDTH*Position::HEIGHT) + 1) / 2 - 3;
 
     const BOTTOM_MASK: u64 = 0b0000001000000100000010000001000000100000010000001;
@@ -106,8 +97,10 @@ impl Position {
         return (self.mask & Position::top_mask_col(col)) == 0;
     }
 
-    pub fn play_col(&mut self, col: i32) {
+    pub fn play_col(&mut self, col: i32) -> bool {
+        let res =  self.is_winning_move(col); 
         self.play((self.mask + Position::bottom_mask_col(col)) & Position::column_mask(col));
+        res
     }
 
     pub fn is_winning_move(&self, col: i32) -> bool {
@@ -142,10 +135,10 @@ impl Position {
     }
 
     fn compute_winning_position(&self, position: u64, mask: u64) -> u64 {
-        // vertical
+        // Vertical
         let mut r: u64 = (position << 1) & (position << 2) & (position << 3);
 
-        // horizontal
+        // Horizontal
         let mut p: u64 = (position << (Position::HEIGHT + 1)) & (position << 2 * (Position::HEIGHT + 1));
         r |= p & (position << 3 * (Position::HEIGHT + 1));
         r |= p & (position >> (Position::HEIGHT + 1));
@@ -153,7 +146,7 @@ impl Position {
         r |= p & (position << (Position::HEIGHT + 1));
         r |= p & (position >> 3 * (Position::HEIGHT + 1));
 
-        // diagonal 1
+        // Diagonal 1
         p = (position << Position::HEIGHT) & (position << 2 * Position::HEIGHT);
         r |= p & (position << 3 * Position::HEIGHT);
         r |= p & (position >> Position::HEIGHT);
@@ -161,7 +154,7 @@ impl Position {
         r |= p & (position << Position::HEIGHT);
         r |= p & (position >> 3 * Position::HEIGHT);
 
-        // diagonal 2
+        // Diagonal 2
         p = (position << (Position::HEIGHT + 2)) & (position << 2 * (Position::HEIGHT + 2));
         r |= p & (position << 3 * (Position::HEIGHT + 2));
         r |= p & (position >> (Position::HEIGHT + 2));
@@ -184,23 +177,35 @@ impl Position {
         return ((1 << Position::HEIGHT) - 1) << col * (Position::HEIGHT + 1);
     }
 
+    pub fn get_space(&self, col: i32, row: i32) -> char {
+        let mask = 1 << (col * 7 + row);
+        if self.mask & mask != 0 {
+            if self.current_position & mask != 0 {
+                return if self.moves % 2 == 0 { 'X' } else { 'O' }
+            } else {
+                return if self.moves % 2 == 0 { 'O' } else { 'X' }
+            }
+        } else {
+            return '.';
+        }
+    }
+
     pub fn to_string(&self) -> String {
         let mut s = String::new();
         for row in (0..Position::HEIGHT).rev() {
+            s.push(char::from_u32((row + 49) as u32).unwrap()); 
+            s.push(' '); 
             for col in 0..Position::WIDTH {
-                let mask = 1 << (col * 7 + row);
-                if self.mask & mask != 0 {
-                    if self.current_position & mask != 0 {
-                        s.push(if self.moves % 2 == 0 { 'X' } else { 'O' });
-                    } else {
-                        s.push(if self.moves % 2 == 0 { 'O' } else { 'X' });
-                    }   
-                } else {
-                    s.push('.');
-                }
+                s.push(self.get_space(col, row)); 
                 s.push(' ')
             }
             s.push('\n');
+        }
+        
+        s.push_str("  "); 
+        for col in 0..Position::WIDTH {
+            s.push(char::from_u32((col + 65) as u32).unwrap());
+            s.push(' ');
         }
         return s
     }

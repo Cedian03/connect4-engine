@@ -6,7 +6,6 @@ mod transposition_table;
 
 use solver::Solver;
 use position::Position;
-use position::GameState;
 
 use clap::Parser;
 use console::Term;
@@ -19,23 +18,21 @@ struct Args {
     o_is_human: bool,
 }
 
-fn human_play(position: &mut Position) {
+fn human_play(position: &mut Position) -> bool {
     let term = Term::stdout();
     let mut input = String::new();
 
     loop {
-        term.write_line("Enter your move (1-7):");
+        term.write_line("Enter your move (A-G):");
         input = term.read_line().unwrap();
+        println!();
 
-        if let Ok(col) = input.trim().parse::<i32>() {
-            if col >= 1 && col <= 7 {
-                position.play_col(col - 1);
-                break;
-            } else {
-                println!("Invalid input: {} (out of range)", input);
-            }
+        let col = input.trim().chars().next().unwrap() as i32 - 65;
+
+        if col >= 0 && col <= 6 {
+            return position.play_col(col);
         } else {
-            println!("Invalid input: {} (not a number)", input);
+            println!("Invalid input: {} (out of range)", input);
         }
     }
 }
@@ -48,25 +45,25 @@ fn main() {
 
     solver.load_book(".book");
 
-    while position.game_state == GameState::InProgress {
+    loop {
         println!("{}", position); 
-        println!("{:?}", solver.analyze(&position, true));
+        println!("Eval: {}\n", solver.solve(&position, true)); 
 
         if position.nb_moves() % 2 == 0 {
             if args.x_is_human {
-                human_play(&mut position)
+                if human_play(&mut position) { break }
             } else {
-                solver.play(&mut position)
+                if solver.play(&mut position) { break}
             }
         } else {
             if args.o_is_human {
-                human_play(&mut position)
+                if human_play(&mut position) { break }
             } else {
-                solver.play(&mut position)
+                if solver.play(&mut position) { break }
             }
         }
     }
-    println!("{:?}", position.game_state);
-    println!("{}", position);
+
+    println!("{}", position); 
 }
 
