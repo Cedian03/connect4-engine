@@ -6,4 +6,4 @@ mod transposition_table;
 
 pub use solver::Solver;
 pub use position::Position;
-pub use position::Stone; 
+pub use position::Stone;
