@@ -1,4 +1,4 @@
-use std::{fmt, iter::Zip};
+use std::{fmt}; 
 
 pub enum Stone {
     X,
@@ -97,10 +97,8 @@ impl Position {
         return (self.mask & Position::top_mask_col(col)) == 0;
     }
 
-    pub fn play_col(&mut self, col: i32) -> bool {
-        let res =  self.is_winning_move(col); 
+    pub fn play_col(&mut self, col: i32) {
         self.play((self.mask + Position::bottom_mask_col(col)) & Position::column_mask(col));
-        res
     }
 
     pub fn is_winning_move(&self, col: i32) -> bool {
@@ -134,7 +132,7 @@ impl Position {
         return (self.mask + Position::BOTTOM_MASK) & Position::BOARD_MASK;
     }
 
-    fn compute_winning_position(&self, position: u64, mask: u64) -> u64 {
+    pub fn compute_winning_position(&self, position: u64, mask: u64) -> u64 {
         // Vertical
         let mut r: u64 = (position << 1) & (position << 2) & (position << 3);
 
@@ -177,16 +175,31 @@ impl Position {
         return ((1 << Position::HEIGHT) - 1) << col * (Position::HEIGHT + 1);
     }
 
-    pub fn get_space(&self, col: i32, row: i32) -> char {
-        let mask = 1 << (col * 7 + row);
-        if self.mask & mask != 0 {
-            if self.current_position & mask != 0 {
-                return if self.moves % 2 == 0 { 'X' } else { 'O' }
-            } else {
-                return if self.moves % 2 == 0 { 'O' } else { 'X' }
-            }
+    fn x_mask(&self) -> u64 {
+        if self.moves % 2 == 0 {
+            return self.current_position
         } else {
-            return '.';
+            return self.current_position ^ self.mask 
+        }
+    }
+
+    fn o_mask(&self) -> u64 {
+        if self.moves % 2 == 1 {
+            return self.current_position
+        } else {
+            return self.current_position ^ self.mask 
+        }
+    }
+
+    pub fn get_space(&self, col: i32, row: i32) -> Option<Stone> {
+        let mask = 1 << (col * 7 + row);
+
+        if self.x_mask() & mask != 0 {
+            return Some(Stone::X)
+        } else if self.o_mask() & mask != 0 {
+            return Some(Stone::O)
+        } else {
+            return None
         }
     }
 
@@ -196,8 +209,11 @@ impl Position {
             s.push(char::from_u32((row + 49) as u32).unwrap()); 
             s.push(' '); 
             for col in 0..Position::WIDTH {
-                s.push(self.get_space(col, row)); 
-                s.push(' ')
+                s.push_str({ match self.get_space(col, row) {
+                    Some(Stone::X) => "X ",
+                    Some(Stone::O) => "O ",
+                    None => ". ",
+                }})
             }
             s.push('\n');
         }

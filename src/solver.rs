@@ -8,6 +8,7 @@ pub enum Score {
     Valid(i32),
     Invalid
 }
+
 pub struct Solver {
     node_count: u64,    
     column_order: [i32; Position::WIDTH as usize],
@@ -164,7 +165,7 @@ impl Solver {
         return scores; 
     }
 
-    pub fn play(&mut self, position: &mut Position) -> bool {
+    pub fn play(&mut self, position: &mut Position) {
         let mut max = i32::MIN;
         let mut col = -1;
 
@@ -177,9 +178,7 @@ impl Solver {
             }
         }
 
-        let res = position.is_winning_move(col);
         position.play_col(col); 
-        res
     }
 
     pub fn get_node_count(&self) -> u64 {

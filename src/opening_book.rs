@@ -9,17 +9,17 @@ use crate::transposition_table::*;
 pub struct OpeningBook {
     width: u8,
     height: u8,
-    depth: i8,
+    depth: Option<u8>,
     table: TranspositionTable<u8>,
 }
 
 impl OpeningBook {
     pub fn new(width: i32, height: i32) -> Self {
-        return OpeningBook { width: width as u8, height: height as u8, depth: -1, table: TranspositionTable::new(0) }
+        return OpeningBook { width: width as u8, height: height as u8, depth: None, table: TranspositionTable::new(0) }
     }
 
     pub fn load(&mut self, path: &str) -> io::Result<()> {
-        self.depth = -1;
+        self.depth = None;
         let mut f = File::open(path).expect("Failed to open file");
 
         let mut meta_buf = [0u8; 6];
@@ -53,15 +53,21 @@ impl OpeningBook {
         let mut_vals: &mut Vec<i8> = self.table.get_mut_values();
         *mut_vals = vals_buf.into_iter().map(|x| x as i8).collect();
 
-        self.depth = _depth as i8;
+        self.depth = Some(_depth);
         return Ok(());
     }
 
     pub fn get(&self, p: &Position) -> Option<i8> {
-        if p.nb_moves() <= self.depth as i32 {
-            return self.table.get(p.key_3());
-        } else {
-            return None;
+        match self.depth {
+            Some(depth) => {
+                if p.nb_moves() <= depth as i32 {
+                    return self.table.get(p.key_3());
+                } else {
+                    return None;
+                }
+            },
+            None => None,
         }
+
     }
 }

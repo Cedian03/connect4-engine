@@ -18,7 +18,7 @@ struct Args {
     o_is_human: bool,
 }
 
-fn human_play(position: &mut Position) -> bool {
+fn human_play(position: &mut Position) {
     let term = Term::stdout();
     let mut input = String::new();
 
@@ -30,7 +30,8 @@ fn human_play(position: &mut Position) -> bool {
         let col = input.trim().chars().next().unwrap() as i32 - 65;
 
         if col >= 0 && col <= 6 {
-            return position.play_col(col);
+            position.play_col(col);
+            break
         } else {
             println!("Invalid input: {} (out of range)", input);
         }
@@ -51,19 +52,17 @@ fn main() {
 
         if position.nb_moves() % 2 == 0 {
             if args.x_is_human {
-                if human_play(&mut position) { break }
+                human_play(&mut position);
             } else {
-                if solver.play(&mut position) { break}
+                solver.play(&mut position);
             }
         } else {
             if args.o_is_human {
-                if human_play(&mut position) { break }
+                human_play(&mut position);
             } else {
-                if solver.play(&mut position) { break }
+                solver.play(&mut position);
             }
         }
     }
-
-    println!("{}", position); 
 }
 
