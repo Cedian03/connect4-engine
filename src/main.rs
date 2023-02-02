@@ -1,11 +1,12 @@
-mod solver;
-mod position;
 mod move_sorter;
 mod opening_book;
+mod position;
+mod solver;
 mod transposition_table;
 
-use solver::Solver;
 use position::Position;
+use position::State;
+use solver::Solver;
 
 use clap::Parser;
 use console::Term;
@@ -31,7 +32,7 @@ fn human_play(position: &mut Position) {
 
         if col >= 0 && col <= 6 {
             position.play_col(col);
-            break
+            break;
         } else {
             println!("Invalid input: {} (out of range)", input);
         }
@@ -41,14 +42,14 @@ fn human_play(position: &mut Position) {
 fn main() {
     let args = Args::parse();
 
-    let mut position = Position::new(); 
+    let mut position = Position::new();
     let mut solver = Solver::new();
 
     solver.load_book(".book");
 
-    loop {
-        println!("{}", position); 
-        println!("Eval: {}\n", solver.solve(&position, true)); 
+    while position.get_state() == State::InProgress {
+        println!("{}", position);
+        println!("Analysis: {:?}\n", solver.analyze(&position, true));
 
         if position.nb_moves() % 2 == 0 {
             if args.x_is_human {
@@ -64,5 +65,7 @@ fn main() {
             }
         }
     }
-}
 
+    println!("{}", position);
+    println!("{:?}", position.get_state())
+}

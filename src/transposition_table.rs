@@ -3,7 +3,7 @@ extern crate num;
 use num::Integer;
 
 const fn med(min: u64, max: u64) -> u64 {
-    return (min + max) / 2; 
+    return (min + max) / 2;
 }
 
 const fn has_factor(n: u64, min: u64, max: u64) -> bool {
@@ -43,7 +43,7 @@ pub struct TranspositionTable<T: Integer> {
 
 impl<T: Integer> TranspositionTable<T> {
     const fn index(&self, key: u64) -> usize {
-        return (key as usize) % self.size
+        return (key as usize) % self.size;
     }
 
     pub fn reset(&mut self) {
@@ -51,15 +51,15 @@ impl<T: Integer> TranspositionTable<T> {
     }
 
     pub fn get_mut_keys(&mut self) -> &mut Vec<T> {
-        return &mut self.keys; 
+        return &mut self.keys;
     }
 
-    pub fn get_mut_values(&mut self) -> &mut Vec<i8> { 
-        return &mut self.vals;  
+    pub fn get_mut_values(&mut self) -> &mut Vec<i8> {
+        return &mut self.vals;
     }
 
     pub fn get_mut_size(&mut self) -> &mut usize {
-        return &mut self.size; 
+        return &mut self.size;
     }
 }
 
@@ -69,28 +69,36 @@ pub trait TableConstructor {
 
 impl TableConstructor for TranspositionTable<u32> {
     fn new(log_size: u8) -> Self {
-        let size: usize = next_prime(1 << log_size) as usize; 
-        return TranspositionTable { keys: vec![0; size], vals: vec![0; size], size };
+        let size: usize = next_prime(1 << log_size) as usize;
+        return TranspositionTable {
+            keys: vec![0; size],
+            vals: vec![0; size],
+            size,
+        };
     }
 }
 
 impl TableConstructor for TranspositionTable<u8> {
     fn new(log_size: u8) -> Self {
-        let size: usize = next_prime(1 << log_size) as usize; 
-        return TranspositionTable { keys: vec![0; size], vals: vec![0; size], size };
+        let size: usize = next_prime(1 << log_size) as usize;
+        return TranspositionTable {
+            keys: vec![0; size],
+            vals: vec![0; size],
+            size,
+        };
     }
 }
 
 pub trait TableGetter {
-    fn put(&mut self, key: u64, val: i8); 
-    fn get(&self, key: u64) -> Option<i8>; 
+    fn put(&mut self, key: u64, val: i8);
+    fn get(&self, key: u64) -> Option<i8>;
 }
 
 impl TableGetter for TranspositionTable<u32> {
     fn put(&mut self, key: u64, val: i8) {
         let i: usize = self.index(key);
         self.keys[i] = key as u32;
-        self.vals[i] = val; 
+        self.vals[i] = val;
     }
 
     fn get(&self, key: u64) -> Option<i8> {
@@ -98,7 +106,7 @@ impl TableGetter for TranspositionTable<u32> {
         if self.keys[i] == key as u32 {
             return Some(self.vals[i]);
         } else {
-            return None
+            return None;
         }
     }
 }
@@ -107,7 +115,7 @@ impl TableGetter for TranspositionTable<u8> {
     fn put(&mut self, key: u64, val: i8) {
         let i: usize = self.index(key);
         self.keys[i] = key as u8;
-        self.vals[i] = val; 
+        self.vals[i] = val;
     }
 
     fn get(&self, key: u64) -> Option<i8> {
@@ -115,8 +123,7 @@ impl TableGetter for TranspositionTable<u8> {
         if self.keys[i] == key as u8 {
             return Some(self.vals[i]);
         } else {
-            return None
+            return None;
         }
     }
 }
-

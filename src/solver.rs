@@ -1,16 +1,10 @@
-use crate::opening_book::OpeningBook;
-use crate::position::Position; 
 use crate::move_sorter::MoveSorter;
+use crate::opening_book::OpeningBook;
+use crate::position::Position;
 use crate::transposition_table::*;
 
-#[derive(Clone)]
-pub enum Score {
-    Valid(i32),
-    Invalid
-}
-
 pub struct Solver {
-    node_count: u64,    
+    node_count: u64,
     column_order: [i32; Position::WIDTH as usize],
     table: TranspositionTable<u32>,
     book: OpeningBook,
@@ -21,17 +15,22 @@ impl Solver {
         let mut column_order: [i32; Position::WIDTH as usize] = [0; Position::WIDTH as usize];
 
         for i in 0..Position::WIDTH {
-            column_order[i as usize] = Position::WIDTH / 2 - (i + 1)*(i % 2 * 2 - 1) / 2
+            column_order[i as usize] = Position::WIDTH / 2 - (i + 1) * (i % 2 * 2 - 1) / 2
         }
 
-        return Solver { node_count: 0, column_order, table: TranspositionTable::new(Solver::TABLE_SIZE), book: OpeningBook::new(Position::WIDTH, Position::HEIGHT) }
+        return Solver {
+            node_count: 0,
+            column_order,
+            table: TranspositionTable::new(Solver::TABLE_SIZE),
+            book: OpeningBook::new(Position::WIDTH, Position::HEIGHT),
+        };
     }
 
     const TABLE_SIZE: u8 = 24;
 
     fn negamax(&mut self, position: &Position, mut alpha: i32, mut beta: i32) -> i32 {
         assert!(alpha < beta);
-        assert!(!position.can_win_next()); 
+        assert!(!position.can_win_next());
 
         self.node_count += 1;
 
@@ -62,18 +61,18 @@ impl Solver {
 
         if let Some(val) = self.book.get(&position) {
             if val == 0 {
-                dbg!(val); 
+                dbg!(val);
             } else {
                 return val as i32 + Position::MIN_SCORE - 1;
             }
         }
-        
+
         let key: u64 = position.key();
         if let Some(val) = self.table.get(key) {
             if val as i32 > Position::MAX_SCORE - Position::MIN_SCORE + 1 {
-                min = val as i32 + 2 * Position::MIN_SCORE - Position::MAX_SCORE - 2; 
+                min = val as i32 + 2 * Position::MIN_SCORE - Position::MAX_SCORE - 2;
                 if alpha < min {
-                    alpha = min; 
+                    alpha = min;
                     if alpha >= beta {
                         return alpha;
                     }
@@ -81,7 +80,7 @@ impl Solver {
             } else {
                 max = val as i32 + Position::MIN_SCORE - 1;
                 if beta > max {
-                    beta = max; 
+                    beta = max;
                     if alpha >= beta {
                         return beta;
                     }
@@ -103,7 +102,10 @@ impl Solver {
             let score: i32 = -self.negamax(&p2, -beta, -alpha);
 
             if score >= beta {
-                self.table.put(key, (score + Position::MAX_SCORE - 2 * Position::MIN_SCORE + 2) as i8);
+                self.table.put(
+                    key,
+                    (score + Position::MAX_SCORE - 2 * Position::MIN_SCORE + 2) as i8,
+                );
                 return score;
             }
 
@@ -113,16 +115,16 @@ impl Solver {
         }
 
         self.table.put(key, (alpha - Position::MIN_SCORE + 1) as i8);
-        return alpha;
+        alpha
     }
 
     pub fn solve(&mut self, position: &Position, strong: bool) -> i32 {
         if position.can_win_next() {
-            return (Position::WIDTH*Position::HEIGHT + 1 - position.nb_moves()) / 2;
+            return (Position::WIDTH * Position::HEIGHT + 1 - position.nb_moves()) / 2;
         }
 
-        let mut min = -(Position::WIDTH*Position::HEIGHT - position.nb_moves()) / 2;
-        let mut max = (Position::WIDTH*Position::HEIGHT + 1 - position.nb_moves()) / 2;
+        let mut min = -(Position::WIDTH * Position::HEIGHT - position.nb_moves()) / 2;
+        let mut max = (Position::WIDTH * Position::HEIGHT + 1 - position.nb_moves()) / 2;
 
         if !strong {
             min = -1;
@@ -144,25 +146,25 @@ impl Solver {
                 min = r
             }
         }
-        return min
-    } 
+        min
+    }
 
-    pub fn analyze(&mut self, position: &Position, strong: bool) -> Vec<Score> {
-        let mut scores: Vec<Score> = vec![Score::Invalid; Position::WIDTH as usize]; 
+    pub fn analyze(&mut self, position: &Position, strong: bool) -> Vec<Option<i32>> {
+        let mut scores: Vec<Option<i32>> = vec![None; Position::WIDTH as usize];
         for col in 0..Position::WIDTH {
             if position.can_play(col) {
                 if position.is_winning_move(col) {
-                    let score = (Position::WIDTH * Position::HEIGHT + 1 - position.nb_moves()) / 2; 
-                    scores[col as usize] = Score::Valid(score);
+                    let score = (Position::WIDTH * Position::HEIGHT + 1 - position.nb_moves()) / 2;
+                    scores[col as usize] = Some(score);
                 } else {
                     let mut position_2: Position = position.clone();
                     position_2.play_col(col);
                     let score = -self.solve(&position_2, strong);
-                    scores[col as usize] = Score::Valid(score)
+                    scores[col as usize] = Some(score)
                 }
             }
         }
-        return scores; 
+        scores
     }
 
     pub fn play(&mut self, position: &mut Position) {
@@ -170,19 +172,19 @@ impl Solver {
         let mut col = -1;
 
         for (index, score) in self.analyze(position, true).iter().enumerate() {
-            if let Score::Valid(score) = score {
+            if let Some(score) = score {
                 if score > &max {
                     max = *score;
                     col = index as i32;
-                } 
+                }
             }
         }
 
-        position.play_col(col); 
+        position.play_col(col);
     }
 
     pub fn get_node_count(&self) -> u64 {
-        return self.node_count; 
+        return self.node_count;
     }
 
     pub fn reset(&mut self) {
@@ -191,6 +193,6 @@ impl Solver {
     }
 
     pub fn load_book(&mut self, path: &str) {
-        self.book.load(path).expect("Failed to load book"); 
+        self.book.load(path).expect("Failed to load book");
     }
 }

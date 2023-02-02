@@ -13,13 +13,16 @@ struct Entry {
 
 impl MoveSorter {
     pub fn new() -> Self {
-        return MoveSorter { size: 0, entries: [Entry { m: 0, s: 0 }; Position::WIDTH as usize]}
+        return MoveSorter {
+            size: 0,
+            entries: [Entry { m: 0, s: 0 }; Position::WIDTH as usize],
+        };
     }
 
     pub fn add(&mut self, m: u64, s: u32) {
         let mut pos = self.size as usize;
-        while pos != 0 && self.entries[pos-1].s > s {
-            self.entries[pos] = self.entries[pos-1];
+        while pos != 0 && self.entries[pos - 1].s > s {
+            self.entries[pos] = self.entries[pos - 1];
             pos -= 1;
         }
         self.entries[pos].m = m;
