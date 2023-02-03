@@ -1,7 +1,12 @@
+use rand::seq::SliceRandom;
+
 use crate::move_sorter::MoveSorter;
 use crate::opening_book::OpeningBook;
 use crate::position::Position;
 use crate::transposition_table::*;
+
+#[derive(Debug)]
+pub struct NoValidMoveError;
 
 pub struct Solver {
     node_count: u64,
@@ -167,20 +172,30 @@ impl Solver {
         scores
     }
 
-    pub fn play(&mut self, position: &mut Position) {
+    pub fn play(&mut self, position: &mut Position) -> Option<i32> {
         let mut max = i32::MIN;
-        let mut col = -1;
+        let mut cols = Vec::new();
 
-        for (index, score) in self.analyze(position, true).iter().enumerate() {
+        for (col, score) in self.analyze(position, true).iter().enumerate() {
             if let Some(score) = score {
                 if score > &max {
                     max = *score;
-                    col = index as i32;
+                    cols = vec![col as i32];
+                } else if *score == max {
+                    cols.push(col as i32)
                 }
             }
         }
 
-        position.play_col(col);
+        let col = cols.choose(&mut rand::thread_rng()); 
+
+        match col {
+            Some(col) => {
+                position.play_col(*col);
+                Some(*col)
+            },
+            None => None
+        }
     }
 
     pub fn get_node_count(&self) -> u64 {
