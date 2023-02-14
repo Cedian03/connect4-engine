@@ -3,7 +3,7 @@ use rand::seq::SliceRandom;
 use crate::move_sorter::MoveSorter;
 use crate::opening_book::OpeningBook;
 use crate::position::Position;
-use crate::transposition_table::*;
+use crate::{transposition_table::*, Disk};
 
 #[derive(Debug)]
 pub struct NoValidMoveError;
@@ -17,7 +17,7 @@ pub struct Solver {
 
 impl Solver {
     pub fn new() -> Self {
-        let mut column_order: [i32; Position::WIDTH as usize] = [0; Position::WIDTH as usize];
+        let mut column_order = [0; Position::WIDTH as usize];
 
         for i in 0..Position::WIDTH {
             column_order[i as usize] = Position::WIDTH / 2 - (i + 1) * (i % 2 * 2 - 1) / 2
@@ -65,11 +65,7 @@ impl Solver {
         }
 
         if let Some(val) = self.book.get(&position) {
-            if val == 0 {
-                dbg!(val);
-            } else {
-                return val as i32 + Position::MIN_SCORE - 1;
-            }
+            return val as i32 + Position::MIN_SCORE - 1;
         }
 
         let key: u64 = position.key();
@@ -103,7 +99,7 @@ impl Solver {
 
         while let Some(next) = moves.get_next() {
             let mut p2: Position = position.clone();
-            p2.play(next);
+            p2.play_mask(next);
             let score: i32 = -self.negamax(&p2, -beta, -alpha);
 
             if score >= beta {
@@ -123,18 +119,13 @@ impl Solver {
         alpha
     }
 
-    pub fn solve(&mut self, position: &Position, strong: bool) -> i32 {
+    pub fn evaluate(&mut self, position: &Position, normalize: bool) -> i32 {
         if position.can_win_next() {
             return (Position::WIDTH * Position::HEIGHT + 1 - position.nb_moves()) / 2;
         }
 
         let mut min = -(Position::WIDTH * Position::HEIGHT - position.nb_moves()) / 2;
         let mut max = (Position::WIDTH * Position::HEIGHT + 1 - position.nb_moves()) / 2;
-
-        if !strong {
-            min = -1;
-            max = 1;
-        }
 
         while min < max {
             let mut med = min + (max - min) / 2;
@@ -145,16 +136,25 @@ impl Solver {
             }
 
             let r = self.negamax(position, med, med + 1);
+
             if r <= med {
                 max = r
             } else {
                 min = r
             }
         }
-        min
+
+        if normalize {
+            match position.disk_to_play() {
+                Disk::X => min,
+                Disk::O => min * -1,
+            }
+        } else {
+            min
+        }
     }
 
-    pub fn analyze(&mut self, position: &Position, strong: bool) -> Vec<Option<i32>> {
+    pub fn analyze(&mut self, position: &Position, normalize: bool) -> Vec<Option<i32>> {
         let mut scores: Vec<Option<i32>> = vec![None; Position::WIDTH as usize];
         for col in 0..Position::WIDTH {
             if position.can_play(col) {
@@ -163,8 +163,8 @@ impl Solver {
                     scores[col as usize] = Some(score);
                 } else {
                     let mut position_2: Position = position.clone();
-                    position_2.play_col(col);
-                    let score = -self.solve(&position_2, strong);
+                    position_2.play(col);
+                    let score = -self.evaluate(&position_2, normalize);
                     scores[col as usize] = Some(score)
                 }
             }
@@ -173,6 +173,17 @@ impl Solver {
     }
 
     pub fn play(&mut self, position: &mut Position) -> Option<i32> {
+        let cols = self.best_possible_cols(position);
+
+        let col = cols.choose(&mut rand::thread_rng());
+
+        match col {
+            Some(col) => Some(*col),
+            None => None,
+        }
+    }
+
+    pub fn best_possible_cols(&mut self, position: &mut Position) -> Vec<i32> {
         let mut max = i32::MIN;
         let mut cols = Vec::new();
 
@@ -187,15 +198,7 @@ impl Solver {
             }
         }
 
-        let col = cols.choose(&mut rand::thread_rng()); 
-
-        match col {
-            Some(col) => {
-                position.play_col(*col);
-                Some(*col)
-            },
-            None => None
-        }
+        cols
     }
 
     pub fn get_node_count(&self) -> u64 {

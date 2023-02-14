@@ -1,7 +1,7 @@
 use std::fmt;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum Stone {
+pub enum Disk {
     X,
     O,
 }
@@ -9,13 +9,12 @@ pub enum Stone {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum State {
     InProgress,
-    Won(Stone),
-    Tie,
+    Won(Disk),
+    Draw,
 }
 
 #[derive(Clone, Debug)]
 pub struct Position {
-    state: State,
     current_position: u64,
     mask: u64,
     moves: i32,
@@ -24,7 +23,6 @@ pub struct Position {
 impl Position {
     pub fn new() -> Self {
         return Position {
-            state: State::InProgress,
             current_position: 0,
             mask: 0,
             moves: 0,
@@ -40,30 +38,24 @@ impl Position {
     const BOTTOM_MASK: u64 = 0b0000001000000100000010000001000000100000010000001;
     const BOARD_MASK: u64 = 0b0111111011111101111110111111011111101111110111111;
 
-    pub fn play(&mut self, m: u64) {
-        if self.winning_positions() & m != 0 {
-            self.state = State::Won(if self.moves % 2 == 0 {
-                Stone::X
-            } else {
-                Stone::O
-            })
-        } else if self.moves == 40 {
-            self.state = State::Tie
-        }
+    pub fn play(&mut self, col: i32) {
+        self.play_mask((self.mask + Position::bottom_mask_col(col)) & Position::column_mask(col));
+    }
 
+    pub fn play_mask(&mut self, m: u64) {
         self.current_position ^= self.mask;
         self.mask |= m;
         self.moves += 1;
     }
 
-    pub fn play_seq(&mut self, seq: &str) -> i32 {
-        for (i, c) in seq.chars().enumerate() {
+    pub fn play_sequence(&mut self, sequence: &str) -> i32 {
+        for (i, c) in sequence.chars().enumerate() {
             let col = c as i32 - '1' as i32;
 
             if col >= Position::WIDTH || !self.can_play(col) || self.is_winning_move(col) {
                 return i as i32;
             }
-            self.play_col(col);
+            self.play(col);
         }
         return 0;
     }
@@ -120,10 +112,6 @@ impl Position {
 
     pub fn can_play(&self, col: i32) -> bool {
         return (self.mask & Position::top_mask_col(col)) == 0;
-    }
-
-    pub fn play_col(&mut self, col: i32) {
-        self.play((self.mask + Position::bottom_mask_col(col)) & Position::column_mask(col));
     }
 
     pub fn is_winning_move(&self, col: i32) -> bool {
@@ -189,22 +177,6 @@ impl Position {
         return r & (Position::BOARD_MASK ^ mask);
     }
 
-    fn x_mask(&self) -> u64 {
-        if self.moves % 2 == 0 {
-            return self.current_position;
-        } else {
-            return self.current_position ^ self.mask;
-        }
-    }
-
-    fn o_mask(&self) -> u64 {
-        if self.moves % 2 == 1 {
-            return self.current_position;
-        } else {
-            return self.current_position ^ self.mask;
-        }
-    }
-
     fn top_mask_col(col: i32) -> u64 {
         return 1 << ((Position::HEIGHT - 1) + col * (Position::HEIGHT + 1));
     }
@@ -217,17 +189,38 @@ impl Position {
         return ((1 << Position::HEIGHT) - 1) << col * (Position::HEIGHT + 1);
     }
 
-    pub fn get_state(&self) -> State {
-        return self.state;
+    pub fn disk_to_play(&self) -> Disk {
+        match self.nb_moves() % 2 {
+            0 => Disk::X,
+            1 => Disk::O,
+            _ => unreachable!(),
+        }
     }
 
-    pub fn get_space(&self, col: i32, row: i32) -> Option<Stone> {
+    pub fn playable_row_in_col(&self, col: i32) -> Option<i32> {
+        for i in 0..Position::HEIGHT {
+            if self.mask & 1 << (col * (Position::HEIGHT + 1) + i) == 0 {
+                return Some(i + 1);
+            }
+        }
+        None
+    }
+
+    pub fn get_space(&self, col: i32, row: i32) -> Option<Disk> {
         let mask = 1 << (col * 7 + row);
 
-        if self.x_mask() & mask != 0 {
-            return Some(Stone::X);
-        } else if self.o_mask() & mask != 0 {
-            return Some(Stone::O);
+        if self.current_position & mask != 0 {
+            return Some(if self.moves % 2 == 0 {
+                Disk::X
+            } else {
+                Disk::O
+            });
+        } else if self.mask & mask != 0 {
+            return Some(if self.moves % 2 == 0 {
+                Disk::O
+            } else {
+                Disk::X
+            });
         } else {
             return None;
         }
@@ -241,8 +234,8 @@ impl Position {
             for col in 0..Position::WIDTH {
                 s.push_str({
                     match self.get_space(col, row) {
-                        Some(Stone::X) => "X ",
-                        Some(Stone::O) => "O ",
+                        Some(Disk::X) => "X ",
+                        Some(Disk::O) => "O ",
                         None => ". ",
                     }
                 })

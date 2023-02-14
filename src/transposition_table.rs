@@ -64,12 +64,12 @@ impl<T: Integer> TranspositionTable<T> {
 }
 
 pub trait TableConstructor {
-    fn new(log_size: u8) -> Self;
+    fn new(table_size: u8) -> Self;
 }
 
 impl TableConstructor for TranspositionTable<u32> {
-    fn new(log_size: u8) -> Self {
-        let size: usize = next_prime(1 << log_size) as usize;
+    fn new(table_size: u8) -> Self {
+        let size = next_prime(1 << table_size) as usize;
         return TranspositionTable {
             keys: vec![0; size],
             vals: vec![0; size],
@@ -79,8 +79,8 @@ impl TableConstructor for TranspositionTable<u32> {
 }
 
 impl TableConstructor for TranspositionTable<u8> {
-    fn new(log_size: u8) -> Self {
-        let size: usize = next_prime(1 << log_size) as usize;
+    fn new(table_size: u8) -> Self {
+        let size = next_prime(1 << table_size) as usize;
         return TranspositionTable {
             keys: vec![0; size],
             vals: vec![0; size],
