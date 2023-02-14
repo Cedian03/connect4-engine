@@ -1,4 +1,3 @@
-mod game_handler;
 mod move_rep;
 mod move_sorter;
 mod opening_book;
