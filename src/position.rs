@@ -20,8 +20,8 @@ pub struct Position {
     moves: i32,
 }
 
-impl From<String> for Position {
-    fn from(value: String) -> Self {
+impl From<&str> for Position {
+    fn from(value: &str) -> Self {
         let mut position = Position::new(); 
 
         for (i, c) in value.chars().enumerate() {
