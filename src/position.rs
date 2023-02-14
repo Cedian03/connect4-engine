@@ -20,6 +20,28 @@ pub struct Position {
     moves: i32,
 }
 
+impl From<String> for Position {
+    fn from(value: String) -> Self {
+        let mut position = Position::new(); 
+
+        for (i, c) in value.chars().enumerate() {
+            let col = match c {
+                'A'..='Z' => (c as i32) - ('A' as i32) + 1,
+                'a'..='z' => (c as i32) - ('a' as i32) + 1,
+                _ => panic!("Invalid sequence at position: {} ({})", i + 1, c),
+            };
+        
+            if col >= 1 && col <= Position::WIDTH {
+                position.play(col - 1);
+            } else {
+                panic!("Invalid column number: {}", col);
+            }
+        }
+
+        position
+    }
+}
+
 impl Position {
     pub fn new() -> Self {
         return Position {
