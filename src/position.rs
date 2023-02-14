@@ -20,50 +20,6 @@ pub struct Position {
     moves: i32,
 }
 
-impl From<&str> for Position {
-    fn from(value: &str) -> Self {
-        let mut position = Position::new(); 
-
-        for (i, c) in value.chars().enumerate() {
-            let col = match c {
-                'A'..='Z' => (c as i32) - ('A' as i32) + 1,
-                'a'..='z' => (c as i32) - ('a' as i32) + 1,
-                _ => panic!("Invalid sequence at position: {} ({})", i + 1, c),
-            };
-        
-            if col >= 1 && col <= Position::WIDTH {
-                position.play(col - 1);
-            } else {
-                panic!("Invalid column number: {}", col);
-            }
-        }
-
-        position
-    }
-}
-
-impl From<String> for Position {
-    fn from(value: String) -> Self {
-        let mut position = Position::new(); 
-
-        for (i, c) in value.chars().enumerate() {
-            let col = match c {
-                'A'..='Z' => (c as i32) - ('A' as i32) + 1,
-                'a'..='z' => (c as i32) - ('a' as i32) + 1,
-                _ => panic!("Invalid sequence at position: {} ({})", i + 1, c),
-            };
-        
-            if col >= 1 && col <= Position::WIDTH {
-                position.play(col - 1);
-            } else {
-                panic!("Invalid column number: {}", col);
-            }
-        }
-
-        position
-    }
-}
-
 impl Position {
     pub fn new() -> Self {
         return Position {
@@ -92,16 +48,20 @@ impl Position {
         self.moves += 1;
     }
 
-    pub fn play_sequence(&mut self, sequence: &str) -> i32 {
+    pub fn play_sequence(&mut self, sequence: &str) {
         for (i, c) in sequence.chars().enumerate() {
-            let col = c as i32 - '1' as i32;
+            let col = match c {
+                'A'..='Z' => (c as i32) - ('A' as i32) + 1,
+                'a'..='z' => (c as i32) - ('a' as i32) + 1,
+                _ => panic!("Invalid sequence at position: {} ({})", i + 1, c),
+            };
 
-            if col >= Position::WIDTH || !self.can_play(col) || self.is_winning_move(col) {
-                return i as i32;
+            if col >= 1 && col <= Position::WIDTH {
+                self.play(col - 1);
+            } else {
+                panic!("Invalid column number: {}", col);
             }
-            self.play(col);
         }
-        return 0;
     }
 
     pub fn can_win_next(&self) -> bool {
