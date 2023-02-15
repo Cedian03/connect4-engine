@@ -8,6 +8,8 @@ pub struct Move {
     pub disk: Disk,
     pub col: i32,
     pub row: i32,
+    pub is_mate: bool, 
+    pub is_draw: bool, 
     pub is_blunder: bool,
     pub is_severe_blunder: bool,
     pub is_only_not_blunder: bool,
@@ -18,12 +20,12 @@ impl Move {
     pub fn new(position: &mut Position, solver: &mut Solver, col: i32) -> Self {
         assert!(position.can_play(col));
 
-        let old_evaluation = solver.evaluate(&position, false);
+        let old_evaluation = solver.evaluate(&position);
 
         let mut new_position = position.clone();
         new_position.play(col);
 
-        let new_evaluation = -solver.evaluate(&new_position, false);
+        let new_evaluation = -solver.evaluate(&new_position);
 
         let evaluation = new_evaluation - old_evaluation;
 
@@ -31,10 +33,14 @@ impl Move {
         let disk = position.disk_to_play();
         let row = position.playable_row_in_col(col).unwrap();
 
+        let mut is_mate = true; 
+        let mut is_draw = true; 
         let mut is_blunder = false;
         let mut is_severe_blunder = false;
 
         if !position.is_winning_move(col) {
+            is_mate = false; 
+            is_draw = turn == 42; 
             is_blunder = (old_evaluation > 0 && new_evaluation == 0)
                 || (old_evaluation == 0 && new_evaluation < 0);
             is_severe_blunder = old_evaluation > 0 && new_evaluation < 0;
@@ -63,6 +69,8 @@ impl Move {
             disk,
             col,
             row,
+            is_mate,
+            is_draw, 
             is_blunder,
             is_severe_blunder,
             is_only_not_blunder,

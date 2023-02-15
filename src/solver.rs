@@ -119,7 +119,7 @@ impl Solver {
         alpha
     }
 
-    pub fn evaluate(&mut self, position: &Position, normalize: bool) -> i32 {
+    pub fn evaluate(&mut self, position: &Position) -> i32 {
         if position.can_win_next() {
             return (Position::WIDTH * Position::HEIGHT + 1 - position.nb_moves()) / 2;
         }
@@ -144,14 +144,7 @@ impl Solver {
             }
         }
 
-        if normalize {
-            match position.disk_to_play() {
-                Disk::X => min,
-                Disk::O => min * -1,
-            }
-        } else {
-            min
-        }
+        min
     }
 
     pub fn analyze(&mut self, position: &Position, normalize: bool) -> Vec<Option<i32>> {
@@ -164,7 +157,7 @@ impl Solver {
                 } else {
                     let mut position_2: Position = position.clone();
                     position_2.play(col);
-                    let score = -self.evaluate(&position_2, normalize);
+                    let score = -self.evaluate(&position_2);
                     scores[col as usize] = Some(score)
                 }
             }
@@ -172,22 +165,11 @@ impl Solver {
         scores
     }
 
-    pub fn play(&mut self, position: &mut Position) -> Option<i32> {
-        let cols = self.best_possible_cols(position);
-
-        let col = cols.choose(&mut rand::thread_rng());
-
-        match col {
-            Some(col) => Some(*col),
-            None => None,
-        }
-    }
-
-    pub fn best_possible_cols(&mut self, position: &mut Position) -> Vec<i32> {
-        let mut max = i32::MIN;
+    pub fn optimal_cols(&mut self, position: &mut Position) -> Vec<i32> {
+        let mut max = Position::MIN_SCORE;
         let mut cols = Vec::new();
 
-        for (col, score) in self.analyze(position, true).iter().enumerate() {
+        for (col, score) in self.analyze(position, false).iter().enumerate() {
             if let Some(score) = score {
                 if score > &max {
                     max = *score;
