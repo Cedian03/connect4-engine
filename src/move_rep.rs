@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::{Disk, Position, Solver, State};
+use crate::{Disk, Position, Solver};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Move {
@@ -8,8 +8,8 @@ pub struct Move {
     pub disk: Disk,
     pub col: i32,
     pub row: i32,
-    pub is_mate: bool, 
-    pub is_draw: bool, 
+    pub is_mate: bool,
+    pub is_draw: bool,
     pub is_blunder: bool,
     pub is_severe_blunder: bool,
     pub is_only_not_blunder: bool,
@@ -33,14 +33,14 @@ impl Move {
         let disk = position.disk_to_play();
         let row = position.playable_row_in_col(col).unwrap();
 
-        let mut is_mate = true; 
-        let mut is_draw = true; 
+        let mut is_mate = true;
+        let mut is_draw = true;
         let mut is_blunder = false;
         let mut is_severe_blunder = false;
 
         if !position.is_winning_move(col) {
-            is_mate = false; 
-            is_draw = turn == 42; 
+            is_mate = false;
+            is_draw = turn == 42;
             is_blunder = (old_evaluation > 0 && new_evaluation == 0)
                 || (old_evaluation == 0 && new_evaluation < 0);
             is_severe_blunder = old_evaluation > 0 && new_evaluation < 0;
@@ -51,7 +51,7 @@ impl Move {
         if old_evaluation < 0 || is_blunder {
             is_only_not_blunder = false
         } else {
-            for (i, eval) in solver.analyze(position, false).iter().enumerate() {
+            for (i, eval) in solver.analyze(position).iter().enumerate() {
                 if i == col as usize {
                     continue;
                 }
@@ -70,7 +70,7 @@ impl Move {
             col,
             row,
             is_mate,
-            is_draw, 
+            is_draw,
             is_blunder,
             is_severe_blunder,
             is_only_not_blunder,

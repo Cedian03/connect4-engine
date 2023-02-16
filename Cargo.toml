@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 num = "0.4.0"
-clap = { version = "4.0", features = ["derive"] }
-console = "0.15.2"
 rand = "0.8.5"
+
+[dev-dependencies]
+clap = { version = "4.0", features = ["derive"] }
+thousands = "0.2.0"

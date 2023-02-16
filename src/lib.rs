@@ -6,7 +6,7 @@ mod position;
 mod solver;
 mod transposition_table;
 
-pub use game_handler::GameHandler; 
+pub use game_handler::GameHandler;
 pub use move_rep::Move;
 pub use position::Disk;
 pub use position::Position;

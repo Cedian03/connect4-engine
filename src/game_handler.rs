@@ -1,6 +1,8 @@
-use crate::{Disk, Move, Position, Solver, State};
+use std::fmt;
 
-use rand::{self, seq::SliceRandom}; 
+use crate::{Move, Position, Solver, State};
+
+use rand::{self, seq::SliceRandom};
 
 pub struct GameHandler {
     pub position: Position,
@@ -29,9 +31,9 @@ impl GameHandler {
             let m = Move::new(&mut self.position, &mut self.solver, col);
 
             if m.is_mate {
-                self.state = State::Won(self.position.disk_to_play()); 
+                self.state = State::Won(self.position.disk_to_play());
             } else if m.is_draw {
-                self.state = State::Draw; 
+                self.state = State::Draw;
             }
 
             self.position.play(col);
@@ -45,14 +47,53 @@ impl GameHandler {
     }
 
     pub fn optimal_col(&mut self) -> i32 {
-        *self.solver.optimal_cols(&mut self.position).choose(&mut rand::thread_rng()).unwrap()
+        *self
+            .solver
+            .optimal_cols(&mut self.position)
+            .choose(&mut rand::thread_rng())
+            .unwrap()
     }
 
     pub fn transcribe(&self) -> String {
-        let mut s = String::new();
-        for m in self.moves.iter() {
-            s.push_str(&format!("{} ", m))
+        let mut string = String::new();
+        for (i, moves) in self.moves.chunks(2).enumerate() {
+            string.push_str(&format!("{})", i + 1));
+
+            let mut winning_disk = None;
+
+            for m in moves {
+                string.push_str(&format!(" {:<4}", format!("{}", m)));
+                if m.is_mate {
+                    winning_disk = Some(m.disk)
+                }
+            }
+
+            if let Some(disk) = winning_disk {
+                string.push_str(&format!(" {:?} wins!", disk))
+            }
+
+            string.push('\n');
         }
-        s
+
+        string
+    }
+}
+
+impl fmt::Display for GameHandler {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let board = format!("{}", self.position);
+        let transcript = self.transcribe();
+
+        let board = board.lines();
+        let mut transcript = transcript.lines().rev();
+
+        for row in board {
+            write!(f, "{} |", row)?;
+            if let Some(x) = transcript.next() {
+                write!(f, " {}", x)?;
+            }
+            write!(f, "\n")?;
+        }
+        Ok(())
     }
 }

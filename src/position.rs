@@ -73,7 +73,7 @@ impl Position {
     }
 
     pub fn key(&self) -> u64 {
-        return self.current_position + self.mask;
+        return self.current_position + self.mask + Position::BOTTOM_MASK;
     }
 
     pub fn key_3(&self) -> u64 {
@@ -210,7 +210,7 @@ impl Position {
         None
     }
 
-    pub fn get_space(&self, col: i32, row: i32) -> Option<Disk> {
+    pub fn get_disk(&self, col: i32, row: i32) -> Option<Disk> {
         let mask = 1 << (col * 7 + row);
 
         if self.current_position & mask != 0 {
@@ -229,35 +229,22 @@ impl Position {
             return None;
         }
     }
-
-    pub fn to_string(&self) -> String {
-        let mut s = String::new();
-        for row in (0..Position::HEIGHT).rev() {
-            s.push(char::from_u32((row + 49) as u32).unwrap());
-            s.push(' ');
-            for col in 0..Position::WIDTH {
-                s.push_str({
-                    match self.get_space(col, row) {
-                        Some(Disk::X) => "X ",
-                        Some(Disk::O) => "O ",
-                        None => ". ",
-                    }
-                })
-            }
-            s.push('\n');
-        }
-
-        s.push_str("  ");
-        for col in 0..Position::WIDTH {
-            s.push(char::from_u32((col + 65) as u32).unwrap());
-            s.push(' ');
-        }
-        return s;
-    }
 }
 
 impl fmt::Display for Position {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.to_string())
+        for row in (0..Position::HEIGHT).rev() {
+            write!(f, "{}", row + 1)?;
+            for col in 0..Position::WIDTH {
+                let ch = match self.get_disk(col, row) {
+                    Some(Disk::X) => 'X',
+                    Some(Disk::O) => 'O',
+                    _ => '.',
+                };
+                write!(f, " {}", ch)?;
+            }
+            write!(f, "\n")?;
+        }
+        write!(f, "  A B C D E F G")
     }
 }

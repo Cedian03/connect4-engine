@@ -39,7 +39,7 @@ impl MoveSorter {
         }
     }
 
-    pub fn reset(&mut self) {
-        self.size = 0;
-    }
+    // pub fn reset(&mut self) {
+    //     self.size = 0;
+    // }
 }

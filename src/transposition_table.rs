@@ -26,13 +26,13 @@ pub const fn next_prime(n: u64) -> u64 {
     }
 }
 
-fn log2(n: u64) -> u32 {
-    if n <= 1 {
-        return 0;
-    } else {
-        return log2(n / 2) + 1;
-    }
-}
+// fn log2(n: u64) -> u32 {
+//     if n <= 1 {
+//         return 0;
+//     } else {
+//         return log2(n / 2) + 1;
+//     }
+// }
 
 #[derive(Debug)]
 pub struct TranspositionTable<T: Integer> {
@@ -46,9 +46,9 @@ impl<T: Integer> TranspositionTable<T> {
         return (key as usize) % self.size;
     }
 
-    pub fn reset(&mut self) {
-        todo!()
-    }
+    // pub fn reset(&mut self) {
+    //     todo!()
+    // }
 
     pub fn get_mut_keys(&mut self) -> &mut Vec<T> {
         return &mut self.keys;
@@ -104,7 +104,12 @@ impl TableGetter for TranspositionTable<u32> {
     fn get(&self, key: u64) -> Option<i8> {
         let i: usize = self.index(key);
         if self.keys[i] == key as u32 {
-            return Some(self.vals[i]);
+            let val = self.vals[i]; 
+            if val != 0 {
+                return Some(val);
+            } else {
+                return None;
+            } 
         } else {
             return None;
         }

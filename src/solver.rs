@@ -1,12 +1,7 @@
-use rand::seq::SliceRandom;
-
 use crate::move_sorter::MoveSorter;
 use crate::opening_book::OpeningBook;
 use crate::position::Position;
-use crate::{transposition_table::*, Disk};
-
-#[derive(Debug)]
-pub struct NoValidMoveError;
+use crate::{transposition_table::*};
 
 pub struct Solver {
     node_count: u64,
@@ -147,7 +142,7 @@ impl Solver {
         min
     }
 
-    pub fn analyze(&mut self, position: &Position, normalize: bool) -> Vec<Option<i32>> {
+    pub fn analyze(&mut self, position: &Position) -> Vec<Option<i32>> {
         let mut scores: Vec<Option<i32>> = vec![None; Position::WIDTH as usize];
         for col in 0..Position::WIDTH {
             if position.can_play(col) {
@@ -169,7 +164,7 @@ impl Solver {
         let mut max = Position::MIN_SCORE;
         let mut cols = Vec::new();
 
-        for (col, score) in self.analyze(position, false).iter().enumerate() {
+        for (col, score) in self.analyze(position).iter().enumerate() {
             if let Some(score) = score {
                 if score > &max {
                     max = *score;
@@ -187,10 +182,10 @@ impl Solver {
         return self.node_count;
     }
 
-    pub fn reset(&mut self) {
-        self.node_count = 0;
-        self.table.reset()
-    }
+    // pub fn reset(&mut self) {
+    //     self.node_count = 0;
+    //     self.table.reset()
+    // }
 
     pub fn load_book(&mut self, path: &str) {
         self.book.load(path).expect("Failed to load book");
