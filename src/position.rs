@@ -1,103 +1,110 @@
+use std::default;
 use std::fmt;
+use std::ops;
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+const fn bottom_mask(w: usize, h: usize) -> u64 {
+    if w == 1 {
+        return 1;
+    }
+
+    (1 << (h + 1) * (w - 1)) | bottom_mask(w - 1, h)
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub enum Disk {
     X,
     O,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum State {
-    InProgress,
-    Won(Disk),
-    Draw,
+impl ops::Not for Disk {
+    type Output = Self;
+
+    fn not(self) -> Self::Output {
+        match self {
+            Disk::X => Disk::O,
+            Disk::O => Disk::X,
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
 pub struct Position {
-    current_position: u64,
+    position: u64,
     mask: u64,
-    moves: i32,
+    half_turn: i32,
 }
 
 impl Position {
+    pub const WIDTH: usize = 7;
+    pub const HEIGHT: usize = 6;
+
+    pub(crate) const AREA: i32 = (Position::WIDTH * Position::HEIGHT) as i32;
+
+    pub(crate) const MIN_SCORE: i32 = -Position::AREA / 2 + 3;
+    pub(crate) const MAX_SCORE: i32 = (Position::AREA + 1) / 2 - 3;
+
+    const BOTTOM_MASK: u64 = bottom_mask(Position::WIDTH, Position::HEIGHT);
+    const BOARD_MASK: u64 = Position::BOTTOM_MASK * ((1 << Position::HEIGHT) - 1);
+
     pub fn new() -> Self {
-        return Position {
-            current_position: 0,
-            mask: 0,
-            moves: 0,
-        };
+        Self::default()
     }
 
-    pub const WIDTH: i32 = 7;
-    pub const HEIGHT: i32 = 6;
-
-    pub const MIN_SCORE: i32 = -(Position::WIDTH * Position::HEIGHT) / 2 + 3;
-    pub const MAX_SCORE: i32 = ((Position::WIDTH * Position::HEIGHT) + 1) / 2 - 3;
-
-    const BOTTOM_MASK: u64 = 0b0000001000000100000010000001000000100000010000001;
-    const BOARD_MASK: u64 = 0b0111111011111101111110111111011111101111110111111;
-
-    pub fn play(&mut self, col: i32) {
-        self.play_mask((self.mask + Position::bottom_mask_col(col)) & Position::column_mask(col));
-    }
-
-    pub fn play_mask(&mut self, m: u64) {
-        self.current_position ^= self.mask;
-        self.mask |= m;
-        self.moves += 1;
-    }
-
-    pub fn play_sequence(&mut self, sequence: &str) {
-        for (i, c) in sequence.chars().enumerate() {
-            let col = match c {
-                'A'..='Z' => (c as i32) - ('A' as i32) + 1,
-                'a'..='z' => (c as i32) - ('a' as i32) + 1,
-                _ => panic!("Invalid sequence at position: {} ({})", i + 1, c),
-            };
-
-            if col >= 1 && col <= Position::WIDTH {
-                self.play(col - 1);
-            } else {
-                panic!("Invalid column number: {}", col);
-            }
+    pub fn play_seq<S: AsRef<str>>(&mut self, seq: S) {
+        for ch in seq.as_ref().chars() {
+            self.play_col(char_to_col(ch).unwrap());
         }
+    }
+
+    pub fn play_col(&mut self, col: usize) {
+        assert!(self.can_play(col));
+        self.play_mask(self.possible_mask_col(col))
+    }
+
+    pub(crate) fn play_mask(&mut self, mask: u64) {
+        self.position ^= self.mask;
+        self.mask |= mask;
+        self.half_turn += 1;
     }
 
     pub fn can_win_next(&self) -> bool {
-        return self.winning_positions() & self.possible() != 0;
+        self.winning_positions() & self.possible() != 0
     }
 
-    pub fn nb_moves(&self) -> i32 {
-        return self.moves;
+    pub fn turn(&self) -> i32 {
+        self.half_turn / 2
     }
 
-    pub fn key(&self) -> u64 {
-        return self.current_position + self.mask + Position::BOTTOM_MASK;
+    pub fn half_turn(&self) -> i32 {
+        self.half_turn
     }
 
-    pub fn key_3(&self) -> u64 {
-        let mut key_forward: u64 = 0;
+    pub(crate) fn key(&self) -> u64 {
+        self.position + self.mask + Position::BOTTOM_MASK
+    }
+
+    pub(crate) fn key_3(&self) -> u64 {
+        let mut key_forward = 0;
         for col in 0..Position::WIDTH {
-            self.partial_key_3(&mut key_forward, col)
+            self.partial_key_3(&mut key_forward, col);
         }
 
-        let mut key_reverse: u64 = 0;
+        let mut key_reverse = 0;
         for col in (0..Position::WIDTH).rev() {
-            self.partial_key_3(&mut key_reverse, col)
+            self.partial_key_3(&mut key_reverse, col);
         }
 
         if key_forward < key_reverse {
-            return key_forward / 3;
+            key_forward / 3
         } else {
-            return key_reverse / 3;
+            key_reverse / 3
         }
     }
 
-    pub fn possible_non_losing_moves(&self) -> u64 {
-        let mut possible_mask: u64 = self.possible();
-        let opponent_win: u64 = self.opponent_winning_positions();
-        let forced_moves: u64 = possible_mask & opponent_win;
+    pub(crate) fn possible_non_losing_moves(&self) -> u64 {
+        let mut possible_mask = self.possible();
+        let opponent_win = self.opponent_winning_positions();
+        let forced_moves = possible_mask & opponent_win;
 
         if forced_moves != 0 {
             if forced_moves.count_ones() > 1 {
@@ -106,28 +113,28 @@ impl Position {
                 possible_mask = forced_moves;
             }
         }
-        return possible_mask & !(opponent_win >> 1);
+        
+        possible_mask & !(opponent_win >> 1)
     }
 
-    pub fn move_score(&self, m: u64) -> u32 {
-        return (self.compute_winning_positions(&self.current_position | m, self.mask))
-            .count_ones();
+    pub(crate) fn move_score(&self, mask: u64) -> u32 {
+        Position::compute_winning_positions(self.position | mask, self.mask).count_ones()
     }
 
-    pub fn can_play(&self, col: i32) -> bool {
-        return (self.mask & Position::top_mask_col(col)) == 0;
+    pub fn can_play(&self, col: usize) -> bool {
+        (self.mask & Position::top_mask_col(col)) == 0
     }
 
-    pub fn is_winning_move(&self, col: i32) -> bool {
-        return self.winning_positions() & self.possible() & Position::column_mask(col) != 0;
+    pub fn is_winning_move(&self, col: usize) -> bool {
+        self.winning_positions() & self.possible() & Position::column_mask(col) != 0
     }
 
-    fn partial_key_3(&self, key: &mut u64, col: i32) {
-        let mut pos: u64 = 1 << (col * (Position::HEIGHT + 1));
+    fn partial_key_3(&self, key: &mut u64, col: usize) {
+        let mut pos = 1 << (col * (Position::HEIGHT + 1));
 
         while pos & self.mask != 0 {
             *key *= 3;
-            if pos & self.current_position != 0 {
+            if pos & self.position != 0 {
                 *key += 1
             } else {
                 *key += 2
@@ -138,24 +145,23 @@ impl Position {
     }
 
     fn winning_positions(&self) -> u64 {
-        return self.compute_winning_positions(self.current_position, self.mask);
+        Position::compute_winning_positions(self.position, self.mask)
     }
 
     fn opponent_winning_positions(&self) -> u64 {
-        return self.compute_winning_positions(self.current_position ^ self.mask, self.mask);
+        Position::compute_winning_positions(self.position ^ self.mask, self.mask)
     }
 
     fn possible(&self) -> u64 {
-        return (self.mask + Position::BOTTOM_MASK) & Position::BOARD_MASK;
+        (self.mask + Position::BOTTOM_MASK) & Position::BOARD_MASK
     }
 
-    pub fn compute_winning_positions(&self, position: u64, mask: u64) -> u64 {
+    pub fn compute_winning_positions(position: u64, mask: u64) -> u64 {
         // Vertical
-        let mut r: u64 = (position << 1) & (position << 2) & (position << 3);
+        let mut r = (position << 1) & (position << 2) & (position << 3);
 
         // Horizontal
-        let mut p: u64 =
-            (position << (Position::HEIGHT + 1)) & (position << 2 * (Position::HEIGHT + 1));
+        let mut p = (position << (Position::HEIGHT + 1)) & (position << 2 * (Position::HEIGHT + 1));
         r |= p & (position << 3 * (Position::HEIGHT + 1));
         r |= p & (position >> (Position::HEIGHT + 1));
         p = (position >> (Position::HEIGHT + 1)) & (position >> 2 * (Position::HEIGHT + 1));
@@ -178,55 +184,59 @@ impl Position {
         r |= p & (position << (Position::HEIGHT + 2));
         r |= p & (position >> 3 * (Position::HEIGHT + 2));
 
-        return r & (Position::BOARD_MASK ^ mask);
+        r & (Position::BOARD_MASK ^ mask)
     }
 
-    fn top_mask_col(col: i32) -> u64 {
-        return 1 << ((Position::HEIGHT - 1) + col * (Position::HEIGHT + 1));
+    fn top_mask_col(col: usize) -> u64 {
+        1 << ((Position::HEIGHT - 1) + col * (Position::HEIGHT + 1))
     }
 
-    fn bottom_mask_col(col: i32) -> u64 {
-        return 1 << col * (Position::HEIGHT + 1);
+    fn bottom_mask_col(col: usize) -> u64 {
+        1 << col * (Position::HEIGHT + 1)
     }
 
-    pub fn column_mask(col: i32) -> u64 {
-        return ((1 << Position::HEIGHT) - 1) << col * (Position::HEIGHT + 1);
+    pub(crate) fn column_mask(col: usize) -> u64 {
+        ((1 << Position::HEIGHT) - 1) << col * (Position::HEIGHT + 1)
     }
 
     pub fn disk_to_play(&self) -> Disk {
-        match self.nb_moves() % 2 {
+        match self.half_turn() % 2 {
             0 => Disk::X,
             1 => Disk::O,
             _ => unreachable!(),
         }
     }
 
-    pub fn playable_row_in_col(&self, col: i32) -> Option<i32> {
-        for i in 0..Position::HEIGHT {
-            if self.mask & 1 << (col * (Position::HEIGHT + 1) + i) == 0 {
-                return Some(i + 1);
-            }
-        }
-        None
+    fn possible_mask_col(&self, col: usize) -> u64 {
+        (self.mask + Position::bottom_mask_col(col)) & Position::column_mask(col)
     }
 
-    pub fn get_disk(&self, col: i32, row: i32) -> Option<Disk> {
-        let mask = 1 << (col * 7 + row);
+    pub fn possible_row_in_col(&self, col: usize) -> Option<usize> {
+        let zeros = self.possible_mask_col(col).trailing_zeros();
+        (zeros != 64).then(|| zeros as usize % (Position::HEIGHT + 1))
+         
+    }
 
-        if self.current_position & mask != 0 {
-            return Some(if self.moves % 2 == 0 {
-                Disk::X
-            } else {
-                Disk::O
-            });
-        } else if self.mask & mask != 0 {
-            return Some(if self.moves % 2 == 0 {
-                Disk::O
-            } else {
-                Disk::X
-            });
-        } else {
-            return None;
+    pub fn get(&self, col: usize, row: usize) -> Option<Disk> {
+        assert!(col < Position::WIDTH);
+        assert!(row < Position::HEIGHT);
+
+        let mask = 1 << (col * (Position::HEIGHT + 1) + row);
+
+        (self.mask & mask != 0).then(|| 
+            match self.position & mask == 0 {
+                true => !self.disk_to_play(),
+                false => self.disk_to_play(),
+        })
+    }
+}
+
+impl default::Default for Position {
+    fn default() -> Self {
+        Self {
+            position: 0,
+            mask: 0,
+            half_turn: 0,
         }
     }
 }
@@ -236,15 +246,24 @@ impl fmt::Display for Position {
         for row in (0..Position::HEIGHT).rev() {
             write!(f, "{}", row + 1)?;
             for col in 0..Position::WIDTH {
-                let ch = match self.get_disk(col, row) {
+                let ch = match self.get(col, row) {
                     Some(Disk::X) => 'X',
                     Some(Disk::O) => 'O',
-                    _ => '.',
+                    None => '.',
                 };
                 write!(f, " {}", ch)?;
             }
             write!(f, "\n")?;
         }
-        write!(f, "  A B C D E F G")
+
+        write!(f, " ")?;
+        for i in 0..Position::WIDTH as u8 {
+            let i = i + 'A' as u8;
+            let c = char::from(i);
+            write!(f, " {}", c)?;
+        }
+
+        Ok(())
     }
 }
+

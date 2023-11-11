@@ -1,9 +1,9 @@
-use connect4_engine::GameHandler;
-use connect4_engine::State;
-
 use std::io;
 
 use clap::Parser;
+
+use connect4_engine::prelude::*;
+use connect4_engine::util::{col_to_char, char_to_col};
 
 #[derive(Parser)]
 struct Args {
@@ -13,46 +13,50 @@ struct Args {
     o_as_human: bool,
 }
 
+fn handle_player_input() -> usize {
+    let mut input = String::new();
+    loop {
+        println!("Enter your move (A-{}):", col_to_char(Position::WIDTH - 1).unwrap());
+
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read line");
+
+        if let Some(ch) = input.chars().next() {
+            if let Some(col) = char_to_col(ch) {
+                return col
+            }
+        }
+    }
+}
+
 fn main() {
     let args = Args::parse();
-    let mut game_handler = GameHandler::new();
+    let mut position = Position::new();
+    let mut solver = Solver::new();
+    solver.load_book(".book");
 
-    while game_handler.state == State::InProgress {
-        println!("{}", game_handler);
+    let mut playing = true;
+    while playing {
+        println!("{}", position);
 
-        let col;
-        if (game_handler.turn % 2 == 1 && !args.x_is_engine)
-            || (game_handler.turn % 2 == 0 && args.o_as_human)
-        {
-            loop {
-                println!("Enter your move (A-G):");
-                let mut input = String::new();
-
-                io::stdin()
-                    .read_line(&mut input)
-                    .expect("Failed to read line");
-
-                let input = input.trim();
-                col = match input {
-                    "A" => 0,
-                    "B" => 1,
-                    "C" => 2,
-                    "D" => 3,
-                    "E" => 4,
-                    "F" => 5,
-                    "G" => 6,
-                    _ => {
-                        println!("Invalid input: {} (out of range)", input);
-                        continue;
-                    }
-                };
-
-                break;
+        let col = {
+            if (position.half_turn() % 2 == 0 && !args.x_is_engine)
+                || (position.half_turn() % 2 == 1 && args.o_as_human) 
+            {
+                handle_player_input()
+            } else {
+                solver.anazlyse(&position)
+                    .into_iter()
+                    .enumerate()
+                    .max_by(|(_, a), (_, b)| a.cmp(b))
+                    .map(|(i, _)| i)
+                    .unwrap()
             }
-        } else {
-            col = game_handler.optimal_col();
-        }
-        game_handler.play(col);
+        };
+
+        playing = !position.is_winning_move(col);
+        position.play_col(col);
     }
-    println!("{}", game_handler);
+    println!("{}", position);
 }
