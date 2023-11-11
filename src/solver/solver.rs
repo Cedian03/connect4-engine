@@ -26,7 +26,7 @@ impl Solver {
         self.book = OpeningBook::load(path).ok()
     }
 
-    pub fn anazlyse(&mut self, position: &Position) -> [Option<i32>; Position::WIDTH] {
+    pub fn analyze(&mut self, position: &Position) -> [Option<i32>; Position::WIDTH] {
         let mut evals = [None; Position::WIDTH];
         for col in 0..Position::WIDTH {
             if position.can_play(col) {

@@ -18,9 +18,9 @@ fn handle_player_input() -> usize {
     loop {
         println!("Enter your move (A-{}):", col_to_char(Position::WIDTH - 1).unwrap());
 
-        io::stdin()
+        let _ = io::stdin()
             .read_line(&mut input)
-            .expect("Failed to read line");
+            .map_err(|_| "Failed to read input, try again");
 
         if let Some(ch) = input.chars().next() {
             if let Some(col) = char_to_col(ch) {
@@ -46,7 +46,7 @@ fn main() {
             {
                 handle_player_input()
             } else {
-                solver.anazlyse(&position)
+                solver.analyze(&position)
                     .into_iter()
                     .enumerate()
                     .max_by(|(_, a), (_, b)| a.cmp(b))
@@ -55,7 +55,7 @@ fn main() {
             }
         };
 
-        playing = !position.is_winning_move(col);
+        playing = !(position.is_winning_move(col) || position.turn() == 21);
         position.play_col(col);
     }
     println!("{}", position);

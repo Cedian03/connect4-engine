@@ -9,8 +9,8 @@ use connect4_engine::prelude::*;
 struct Args {
     #[arg(short = 's', long = "sequence")]
     sequence: Option<String>,
-    #[arg(short = 'o', long = "no-opening-book")]
-    no_opening_book: bool,
+    #[arg(short = 'o', long = "opening-book")]
+    opening_book: Option<String>,
 }
 
 fn main() {
@@ -23,8 +23,8 @@ fn main() {
         position.play_seq(seq);
     }
 
-    if !args.no_opening_book {
-        solver.load_book(".book")
+    if let Some(path) = args.opening_book {
+        solver.load_book(path)
     }
 
     println!("Solving position:\n{}", &position);

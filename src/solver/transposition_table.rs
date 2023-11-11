@@ -33,8 +33,8 @@ impl TranspositionTable {
     pub fn new(log_size: usize) -> Self {
         let size = next_prime(log_size);
         Self { 
-            keys: Vec::new(), 
-            vals: Vec::new(), 
+            keys: vec![0; size], 
+            vals: vec![0; size], 
             size
         }
     }
