@@ -22,8 +22,9 @@ impl Solver {
         Self::default()
     }
 
-    pub fn load_book<P: AsRef<Path>>(&mut self, path: P) {
-        self.book = OpeningBook::load(path).ok()
+    pub fn load_book<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
+        self.book = Some(OpeningBook::load(path)?);
+        Ok(())
     }
 
     pub fn analyze(&mut self, position: &Position) -> [Option<i32>; Position::WIDTH] {

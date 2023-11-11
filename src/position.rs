@@ -2,6 +2,7 @@ use std::default;
 use std::fmt;
 use std::ops;
 
+use crate::prelude::*;
 use crate::util::char_to_col;
 
 const fn bottom_mask(w: usize, h: usize) -> u64 {
@@ -52,10 +53,11 @@ impl Position {
         Self::default()
     }
 
-    pub fn play_seq<S: AsRef<str>>(&mut self, seq: S) {
+    pub fn play_seq<S: AsRef<str>>(&mut self, seq: S) -> Result<()> {
         for ch in seq.as_ref().chars() {
-            self.play_col(char_to_col(ch).unwrap());
+            self.play_col(char_to_col(ch)?)
         }
+        Ok(())
     }
 
     pub fn play_col(&mut self, col: usize) {

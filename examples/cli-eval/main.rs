@@ -13,18 +13,18 @@ struct Args {
     opening_book: Option<String>,
 }
 
-fn main() {
+fn main() -> Result<()> {
     let args = Args::parse();
 
     let mut position = Position::default();
     let mut solver = Solver::new();
 
     if let Some(seq) = args.sequence {
-        position.play_seq(seq);
+        position.play_seq(seq)?
     }
 
     if let Some(path) = args.opening_book {
-        solver.load_book(path)
+        solver.load_book(path)?
     }
 
     println!("Solving position:\n{}", &position);
@@ -44,4 +44,6 @@ fn main() {
             .map_or("INFINITE".to_string(), |x| (x * 1000).separate_with_spaces()),
         evaluation,
     );
+
+    Ok(())
 }

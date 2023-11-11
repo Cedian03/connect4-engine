@@ -1,11 +1,9 @@
 use std::fs::File;
-use std::io;
-use std::io::prelude::*;
+use std::io::Read;
 use std::path::Path;
 
-use crate::position::Position;
-
-use crate::solver::transposition_table::*;
+use crate::prelude::*;
+use crate::solver::transposition_table::TranspositionTable;
 
 #[derive(Debug)]
 pub struct OpeningBook {
@@ -14,10 +12,10 @@ pub struct OpeningBook {
 }
 
 impl OpeningBook {
-    pub fn load<P: AsRef<Path>>(path: P) -> io::Result<Self> {
+    pub fn load<P: AsRef<Path>>(path: P) -> Result<Self> {
         let mut f = File::open(path)?;
 
-        let mut meta_buf = [0u8; 6];
+        let mut meta_buf = [0; 6];
         f.read_exact(&mut meta_buf)?;
 
         let width = meta_buf[0] as usize;
@@ -27,12 +25,18 @@ impl OpeningBook {
         let val_size = meta_buf[4] as usize;
         let log_size = meta_buf[5] as usize;
 
-        assert!(width == Position::WIDTH);
-        assert!(height == Position::HEIGHT);
-        assert!(depth <= Position::AREA as usize);
-        assert!(key_size == 1);
-        assert!(val_size == 1);
-        assert!(log_size <= 40);
+        (width == Position::WIDTH).then(|| ())
+            .ok_or(Error::LoadBook("Invaild width".to_string()))?;
+        (height == Position::HEIGHT).then(|| ())
+            .ok_or(Error::LoadBook("Invalid height".to_string()))?;
+        (depth <= Position::AREA as usize).then(|| ())
+            .ok_or(Error::LoadBook("Invalid depth".to_string()))?;
+        (key_size == 1).then(|| ())
+            .ok_or(Error::LoadBook("Invalid key size".to_string()))?;
+        (val_size == 1).then(|| ())
+            .ok_or(Error::LoadBook("Invalid value size".to_string()))?;
+        (log_size <= 40).then(|| ())
+            .ok_or(Error::LoadBook("Invalid table size".to_string()))?;
 
         let mut table = TranspositionTable::new(log_size);
 
