@@ -10,7 +10,7 @@ use crate::solver::transposition_table::*;
 #[derive(Debug)]
 pub struct Solver {
     column_order: [usize; Position::WIDTH],
-    table: TranspositionTable<u32>,
+    table: TranspositionTable,
     book: Option<OpeningBook>,
     pub node_count: u64,
 }

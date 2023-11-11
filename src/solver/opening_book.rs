@@ -9,7 +9,7 @@ use crate::solver::transposition_table::*;
 
 #[derive(Debug)]
 pub struct OpeningBook {
-    table: TranspositionTable<u8>,
+    table: TranspositionTable,
     depth: usize,
 }
 
@@ -39,7 +39,7 @@ impl OpeningBook {
         let mut keys_buf = vec![0; table.size * key_size];
         f.read_exact(&mut keys_buf)?;
         let mut_keys = table.get_mut_keys();
-        *mut_keys = keys_buf;
+        *mut_keys = keys_buf.into_iter().map(|x| x as u32).collect();
 
         let mut vals_buf = vec![0; table.size * val_size];
         f.read_exact(&mut vals_buf)?;

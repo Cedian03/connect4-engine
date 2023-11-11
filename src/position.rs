@@ -2,6 +2,8 @@ use std::default;
 use std::fmt;
 use std::ops;
 
+use crate::util::char_to_col;
+
 const fn bottom_mask(w: usize, h: usize) -> u64 {
     if w == 1 {
         return 1;
