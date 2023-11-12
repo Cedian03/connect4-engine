@@ -1,4 +1,4 @@
-use crate::position::Position;
+use crate::prelude::*;
 
 #[derive(Debug, Default)]
 pub struct MoveSorter {

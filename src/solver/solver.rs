@@ -2,10 +2,9 @@ use std::default;
 use std::path::Path;
 
 use crate::prelude::*;
-
 use crate::solver::MoveSorter;
 use crate::solver::OpeningBook;
-use crate::solver::transposition_table::*;
+use crate::solver::TranspositionTable;
 
 #[derive(Debug)]
 pub struct Solver {

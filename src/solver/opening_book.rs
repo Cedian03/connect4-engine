@@ -3,7 +3,7 @@ use std::io::Read;
 use std::path::Path;
 
 use crate::prelude::*;
-use crate::solver::transposition_table::TranspositionTable;
+use crate::solver::TranspositionTable;
 
 #[derive(Debug)]
 pub struct OpeningBook {

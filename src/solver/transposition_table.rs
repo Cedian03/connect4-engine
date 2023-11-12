@@ -31,7 +31,7 @@ pub struct TranspositionTable {
 
 impl TranspositionTable {
     pub fn new(log_size: usize) -> Self {
-        let size = next_prime(log_size);
+        let size = next_prime(1 << log_size);
         Self { 
             keys: vec![0; size], 
             vals: vec![0; size], 
@@ -47,9 +47,9 @@ impl TranspositionTable {
 
     pub fn get(&self, key: u64) -> Option<i32> {
         let i = self.index(key);
-        (self.keys[i] == key as u32).then(|| {
-            self.vals[i] as i32
-        })
+        (self.keys[i] == key as u32)
+            .then(|| { self.vals[i] as i32 })
+            .filter(|&v| v != 0)
     }
 
     fn index(&self, key: u64) -> usize {
