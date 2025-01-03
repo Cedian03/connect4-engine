@@ -157,7 +157,7 @@ impl Solver {
     }
 
     fn column_order() -> [usize; Position::WIDTH] {
-        core::array::from_fn(|i| match i % 2 {
+        std::array::from_fn(|i| match i % 2 {
             0 => Position::WIDTH / 2 + (i / 2),
             1 => Position::WIDTH / 2 - (i / 2 + 1),
             _ => unreachable!(),

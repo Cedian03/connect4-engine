@@ -5,7 +5,7 @@ use std::ops;
 use crate::prelude::*;
 use crate::util::char_to_col;
 
-const fn bottom_mask(w: usize, h: usize) -> u64 {
+const fn bottom_mask(w: usize, h: usize) -> BitMask {
     if w == 1 {
         return 1;
     }
@@ -32,8 +32,8 @@ impl ops::Not for Disk {
 
 #[derive(Clone, Debug)]
 pub struct Position {
-    position: u64,
-    mask: u64,
+    position: BitMask,
+    mask: BitMask,
     half_turn: i32,
 }
 
@@ -46,8 +46,8 @@ impl Position {
     pub(crate) const MIN_SCORE: i32 = -Position::AREA / 2 + 3;
     pub(crate) const MAX_SCORE: i32 = (Position::AREA + 1) / 2 - 3;
 
-    const BOTTOM_MASK: u64 = bottom_mask(Position::WIDTH, Position::HEIGHT);
-    const BOARD_MASK: u64 = Position::BOTTOM_MASK * ((1 << Position::HEIGHT) - 1);
+    const BOTTOM_MASK: BitMask = bottom_mask(Position::WIDTH, Position::HEIGHT);
+    const BOARD_MASK: BitMask = Position::BOTTOM_MASK * ((1 << Position::HEIGHT) - 1);
 
     pub fn new() -> Self {
         Self::default()
@@ -65,7 +65,7 @@ impl Position {
         self.play_mask(self.possible_mask_col(col))
     }
 
-    pub(crate) fn play_mask(&mut self, mask: u64) {
+    pub(crate) fn play_mask(&mut self, mask: BitMask) {
         self.position ^= self.mask;
         self.mask |= mask;
         self.half_turn += 1;
@@ -83,11 +83,11 @@ impl Position {
         self.half_turn
     }
 
-    pub(crate) fn key(&self) -> u64 {
+    pub(crate) fn key(&self) -> BitMask {
         self.position + self.mask + Position::BOTTOM_MASK
     }
 
-    pub(crate) fn key_3(&self) -> u64 {
+    pub(crate) fn key_3(&self) -> BitMask {
         let mut key_forward = 0;
         for col in 0..Position::WIDTH {
             self.partial_key_3(&mut key_forward, col);
@@ -105,7 +105,7 @@ impl Position {
         }
     }
 
-    pub(crate) fn possible_non_losing_moves(&self) -> u64 {
+    pub(crate) fn possible_non_losing_moves(&self) -> BitMask {
         let mut possible_mask = self.possible();
         let opponent_win = self.opponent_winning_positions();
         let forced_moves = possible_mask & opponent_win;
@@ -117,11 +117,11 @@ impl Position {
                 possible_mask = forced_moves;
             }
         }
-        
+
         possible_mask & !(opponent_win >> 1)
     }
 
-    pub(crate) fn move_score(&self, mask: u64) -> u32 {
+    pub(crate) fn move_score(&self, mask: BitMask) -> u32 {
         Position::compute_winning_positions(self.position | mask, self.mask).count_ones()
     }
 
@@ -133,7 +133,7 @@ impl Position {
         self.winning_positions() & self.possible() & Position::column_mask(col) != 0
     }
 
-    fn partial_key_3(&self, key: &mut u64, col: usize) {
+    fn partial_key_3(&self, key: &mut BitMask, col: usize) {
         let mut pos = 1 << (col * (Position::HEIGHT + 1));
 
         while pos & self.mask != 0 {
@@ -148,19 +148,19 @@ impl Position {
         *key *= 3;
     }
 
-    fn winning_positions(&self) -> u64 {
+    fn winning_positions(&self) -> BitMask {
         Position::compute_winning_positions(self.position, self.mask)
     }
 
-    fn opponent_winning_positions(&self) -> u64 {
+    fn opponent_winning_positions(&self) -> BitMask {
         Position::compute_winning_positions(self.position ^ self.mask, self.mask)
     }
 
-    fn possible(&self) -> u64 {
+    fn possible(&self) -> BitMask {
         (self.mask + Position::BOTTOM_MASK) & Position::BOARD_MASK
     }
 
-    pub fn compute_winning_positions(position: u64, mask: u64) -> u64 {
+    pub fn compute_winning_positions(position: BitMask, mask: BitMask) -> BitMask {
         // Vertical
         let mut r = (position << 1) & (position << 2) & (position << 3);
 
@@ -191,15 +191,15 @@ impl Position {
         r & (Position::BOARD_MASK ^ mask)
     }
 
-    fn top_mask_col(col: usize) -> u64 {
+    fn top_mask_col(col: usize) -> BitMask {
         1 << ((Position::HEIGHT - 1) + col * (Position::HEIGHT + 1))
     }
 
-    fn bottom_mask_col(col: usize) -> u64 {
+    fn bottom_mask_col(col: usize) -> BitMask {
         1 << col * (Position::HEIGHT + 1)
     }
 
-    pub(crate) fn column_mask(col: usize) -> u64 {
+    pub(crate) fn column_mask(col: usize) -> BitMask {
         ((1 << Position::HEIGHT) - 1) << col * (Position::HEIGHT + 1)
     }
 
@@ -211,14 +211,13 @@ impl Position {
         }
     }
 
-    fn possible_mask_col(&self, col: usize) -> u64 {
+    fn possible_mask_col(&self, col: usize) -> BitMask {
         (self.mask + Position::bottom_mask_col(col)) & Position::column_mask(col)
     }
 
     pub fn possible_row_in_col(&self, col: usize) -> Option<usize> {
         let zeros = self.possible_mask_col(col).trailing_zeros();
         (zeros != 64).then(|| zeros as usize % (Position::HEIGHT + 1))
-         
     }
 
     pub fn get(&self, col: usize, row: usize) -> Option<Disk> {
@@ -227,11 +226,14 @@ impl Position {
 
         let mask = 1 << (col * (Position::HEIGHT + 1) + row);
 
-        (self.mask & mask != 0).then(|| 
-            match self.position & mask == 0 {
-                true => !self.disk_to_play(),
-                false => self.disk_to_play(),
+        (self.mask & mask != 0).then(|| match self.position & mask == 0 {
+            true => !self.disk_to_play(),
+            false => self.disk_to_play(),
         })
+    }
+
+    pub const fn bits_required() -> usize {
+        Self::WIDTH * (Self::HEIGHT + 1)
     }
 }
 
@@ -270,4 +272,3 @@ impl fmt::Display for Position {
         Ok(())
     }
 }
-

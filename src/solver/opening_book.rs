@@ -25,17 +25,23 @@ impl OpeningBook {
         let val_size = meta_buf[4] as usize;
         let log_size = meta_buf[5] as usize;
 
-        (width == Position::WIDTH).then(|| ())
+        (width == Position::WIDTH)
+            .then(|| ())
             .ok_or(Error::LoadBook("Invaild width".to_string()))?;
-        (height == Position::HEIGHT).then(|| ())
+        (height == Position::HEIGHT)
+            .then(|| ())
             .ok_or(Error::LoadBook("Invalid height".to_string()))?;
-        (depth <= Position::AREA as usize).then(|| ())
+        (depth <= Position::AREA as usize)
+            .then(|| ())
             .ok_or(Error::LoadBook("Invalid depth".to_string()))?;
-        (key_size == 1).then(|| ())
+        (key_size == 1)
+            .then(|| ())
             .ok_or(Error::LoadBook("Invalid key size".to_string()))?;
-        (val_size == 1).then(|| ())
+        (val_size == 1)
+            .then(|| ())
             .ok_or(Error::LoadBook("Invalid value size".to_string()))?;
-        (log_size <= 40).then(|| ())
+        (log_size <= 40)
+            .then(|| ())
             .ok_or(Error::LoadBook("Invalid table size".to_string()))?;
 
         let mut table = TranspositionTable::new(log_size);

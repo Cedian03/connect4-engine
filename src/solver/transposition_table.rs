@@ -1,3 +1,5 @@
+use crate::prelude::*;
+
 fn next_prime(n: usize) -> usize {
     if has_factor(n, 2, n) {
         return next_prime(n + 1);
@@ -32,27 +34,27 @@ pub struct TranspositionTable {
 impl TranspositionTable {
     pub fn new(log_size: usize) -> Self {
         let size = next_prime(1 << log_size);
-        Self { 
-            keys: vec![0; size], 
-            vals: vec![0; size], 
-            size
+        Self {
+            keys: vec![0; size],
+            vals: vec![0; size],
+            size,
         }
     }
 
-    pub fn put(&mut self, key: u64, val: i8) {
+    pub fn put(&mut self, key: BitMask, val: i8) {
         let i = self.index(key);
         self.keys[i] = key as u32;
         self.vals[i] = val;
     }
 
-    pub fn get(&self, key: u64) -> Option<i32> {
+    pub fn get(&self, key: BitMask) -> Option<i32> {
         let i = self.index(key);
         (self.keys[i] == key as u32)
-            .then(|| { self.vals[i] as i32 })
+            .then(|| self.vals[i] as i32)
             .filter(|&v| v != 0)
     }
 
-    fn index(&self, key: u64) -> usize {
+    fn index(&self, key: BitMask) -> usize {
         return (key as usize) % self.size;
     }
 

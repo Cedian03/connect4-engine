@@ -13,14 +13,15 @@ pub fn row_to_char(row: usize) -> Result<char> {
 }
 
 pub fn char_to_col(ch: char) -> Result<usize> {
-    (ch as usize).checked_sub('A' as usize)
+    (ch as usize)
+        .checked_sub('A' as usize)
         .filter(|&col| (col < Position::WIDTH))
         .ok_or_else(|| Error::Convert(format!("Invalid column char: '{ch}'")))
 }
 
 pub fn char_to_row(ch: char) -> Result<usize> {
-    (ch as usize).checked_sub('1' as usize)
+    (ch as usize)
+        .checked_sub('1' as usize)
         .filter(|&row| (row < Position::HEIGHT))
         .ok_or_else(|| Error::Convert(format!("Invalid row char: '{ch}'")))
 }
-
