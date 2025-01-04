@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{Error, Position, Result};
 
 pub fn col_to_char(col: usize) -> Result<char> {
     (col < Position::WIDTH)

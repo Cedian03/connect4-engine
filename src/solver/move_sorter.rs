@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{BitMask, Position};
 
 #[derive(Debug, Default)]
 pub struct MoveSorter {
@@ -8,8 +8,8 @@ pub struct MoveSorter {
 
 #[derive(Clone, Debug, Default)]
 struct Entry {
-    pub mask: BitMask,
-    pub score: u32,
+    mask: BitMask,
+    score: u32,
 }
 
 impl MoveSorter {

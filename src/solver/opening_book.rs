@@ -2,8 +2,8 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-use crate::prelude::*;
-use crate::solver::TranspositionTable;
+use super::TranspositionTable;
+use crate::{Error, Position, Result};
 
 #[derive(Debug)]
 pub struct OpeningBook {
@@ -31,7 +31,7 @@ impl OpeningBook {
         (height == Position::HEIGHT)
             .then(|| ())
             .ok_or(Error::LoadBook("Invalid height".to_string()))?;
-        (depth <= Position::AREA as usize)
+        (depth <= Position::WIDTH * Position::HEIGHT)
             .then(|| ())
             .ok_or(Error::LoadBook("Invalid depth".to_string()))?;
         (key_size == 1)
@@ -44,19 +44,25 @@ impl OpeningBook {
             .then(|| ())
             .ok_or(Error::LoadBook("Invalid table size".to_string()))?;
 
-        let mut table = TranspositionTable::new(log_size);
+        let size = TranspositionTable::size(log_size);
 
-        let mut keys_buf = vec![0; table.size * key_size];
-        f.read_exact(&mut keys_buf)?;
-        let mut_keys = table.get_mut_keys();
-        *mut_keys = keys_buf.into_iter().map(|x| x as u32).collect();
+        let key_bytes = key_size * size;
+        let val_bytes = val_size * size;
 
-        let mut vals_buf = vec![0; table.size * val_size];
-        f.read_exact(&mut vals_buf)?;
-        let mut_vals = table.get_mut_values();
-        *mut_vals = vals_buf.into_iter().map(|x| x as i8).collect();
+        let mut buf = vec![0; usize::max(key_bytes, val_bytes)];
 
-        Ok(Self { table, depth })
+        let key_view = &mut buf[0..key_bytes];
+        f.read_exact(key_view)?;
+        let keys = key_view.iter().map(|x| *x as u32).collect();
+
+        let val_view = &mut buf[0..val_bytes];
+        f.read_exact(val_view)?;
+        let vals = val_view.iter().map(|x| *x as i8).collect();
+
+        Ok(Self {
+            table: TranspositionTable::from_parts(keys, vals),
+            depth,
+        })
     }
 
     pub fn get(&self, p: &Position) -> Option<i32> {

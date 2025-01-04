@@ -1,24 +1,31 @@
 use std::default;
 use std::path::Path;
 
-use crate::prelude::*;
-use crate::solver::MoveSorter;
-use crate::solver::OpeningBook;
-use crate::solver::TranspositionTable;
+use super::{MoveSorter, OpeningBook, TranspositionTable};
+use crate::{BitMask, Position, Result};
 
 #[derive(Debug)]
 pub struct Solver {
-    column_order: [usize; Position::WIDTH],
     table: TranspositionTable,
     book: Option<OpeningBook>,
-    pub node_count: u64,
+    searched: u64,
 }
 
 impl Solver {
     const TABLE_SIZE: usize = 24;
 
+    const MAX_DEPTH: i32 = (Position::WIDTH * Position::HEIGHT) as i32;
+    const MIN_SCORE: i32 = -Self::MAX_DEPTH / 2 + 3;
+    const MAX_SCORE: i32 = (Self::MAX_DEPTH + 1) / 2 - 3;
+
+    pub const COLUMN_ORDER: [usize; Position::WIDTH] = Self::column_order();
+
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn searched(&self) -> u64 {
+        self.searched
     }
 
     pub fn load_book<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
@@ -29,7 +36,7 @@ impl Solver {
     pub fn analyze(&mut self, position: &Position) -> [Option<i32>; Position::WIDTH] {
         let mut evals = [None; Position::WIDTH];
         for col in 0..Position::WIDTH {
-            if position.can_play(col) {
+            if position.can_play_col(col) {
                 let mut new_position = position.clone();
                 new_position.play_col(col);
                 let eval = -self.evaluate(&new_position);
@@ -42,11 +49,11 @@ impl Solver {
 
     pub fn evaluate(&mut self, position: &Position) -> i32 {
         if position.can_win_next() {
-            return (Position::AREA + 1 - position.half_turn()) / 2;
+            return (Self::MAX_DEPTH + 1 - position.half_turn()) / 2;
         }
 
-        let mut min = -(Position::AREA - position.half_turn()) / 2;
-        let mut max = (Position::AREA + 1 - position.half_turn()) / 2;
+        let mut min = -(Self::MAX_DEPTH - position.half_turn()) / 2;
+        let mut max = (Self::MAX_DEPTH + 1 - position.half_turn()) / 2;
 
         while min < max {
             let mut med = min + (max - min) / 2;
@@ -72,18 +79,18 @@ impl Solver {
         assert!(alpha < beta);
         assert!(!position.can_win_next());
 
-        self.node_count += 1;
+        self.searched += 1;
 
         let possible = position.possible_non_losing_moves();
         if possible == 0 {
-            return -(Position::AREA - position.half_turn()) / 2;
+            return -(Self::MAX_DEPTH - position.half_turn()) / 2;
         }
 
-        if position.half_turn() >= Position::AREA - 2 {
+        if position.half_turn() >= Self::MAX_DEPTH - 2 {
             return 0;
         }
 
-        let mut min = -(Position::AREA - 2 - position.half_turn()) / 2;
+        let mut min = -(Self::MAX_DEPTH - 2 - position.half_turn()) / 2;
         if alpha < min {
             alpha = min;
             if alpha >= beta {
@@ -91,7 +98,7 @@ impl Solver {
             }
         }
 
-        let mut max = (Position::AREA - 1 - position.half_turn()) / 2;
+        let mut max = (Self::MAX_DEPTH - 1 - position.half_turn()) / 2;
         if beta > max {
             beta = max;
             if alpha >= beta {
@@ -101,14 +108,14 @@ impl Solver {
 
         if let Some(book) = &self.book {
             if let Some(val) = book.get(&position) {
-                return val as i32 + Position::MIN_SCORE - 1;
+                return val as i32 + Self::MIN_SCORE - 1;
             }
         }
 
         let key = position.key();
         if let Some(val) = self.table.get(key) {
-            if val as i32 > Position::MAX_SCORE - Position::MIN_SCORE + 1 {
-                min = val as i32 + 2 * Position::MIN_SCORE - Position::MAX_SCORE - 2;
+            if val as i32 > Self::MAX_SCORE - Self::MIN_SCORE + 1 {
+                min = val as i32 + 2 * Self::MIN_SCORE - Self::MAX_SCORE - 2;
                 if alpha < min {
                     alpha = min;
                     if alpha >= beta {
@@ -116,7 +123,7 @@ impl Solver {
                     }
                 }
             } else {
-                max = val as i32 + Position::MIN_SCORE - 1;
+                max = val as i32 + Self::MIN_SCORE - 1;
                 if beta > max {
                     beta = max;
                     if alpha >= beta {
@@ -128,9 +135,9 @@ impl Solver {
 
         let mut moves = MoveSorter::default();
         for i in (0..Position::WIDTH).rev() {
-            let mask = possible & Position::column_mask(self.column_order[i]);
+            let mask = possible & Position::col_mask(Self::COLUMN_ORDER[i]);
             if mask != 0 {
-                moves.add(mask, position.move_score(mask));
+                moves.add(mask, Self::score(position, mask));
             }
         }
 
@@ -142,7 +149,7 @@ impl Solver {
             if score >= beta {
                 self.table.put(
                     key,
-                    (score + Position::MAX_SCORE - 2 * Position::MIN_SCORE + 2) as i8,
+                    (score + Self::MAX_SCORE - 2 * Self::MIN_SCORE + 2) as i8,
                 );
                 return score;
             }
@@ -152,26 +159,39 @@ impl Solver {
             }
         }
 
-        self.table.put(key, (alpha - Position::MIN_SCORE + 1) as i8);
+        self.table.put(key, (alpha - Self::MIN_SCORE + 1) as i8);
         alpha
     }
 
-    fn column_order() -> [usize; Position::WIDTH] {
-        std::array::from_fn(|i| match i % 2 {
-            0 => Position::WIDTH / 2 + (i / 2),
-            1 => Position::WIDTH / 2 - (i / 2 + 1),
-            _ => unreachable!(),
-        })
+    const fn score(position: &Position, mask: BitMask) -> u32 {
+        Position::compute_winning_positions(position.position() | mask, position.mask())
+            .count_ones()
+    }
+
+    const fn column_order() -> [usize; Position::WIDTH] {
+        let mut order = [0; Position::WIDTH];
+
+        let mut i = 0;
+        while i < Position::WIDTH {
+            order[i] = match i % 2 {
+                0 => Position::WIDTH / 2 + (i / 2),
+                1 => Position::WIDTH / 2 - (i / 2 + 1),
+                _ => unreachable!(),
+            };
+
+            i += 1;
+        }
+
+        order
     }
 }
 
 impl default::Default for Solver {
     fn default() -> Self {
         Self {
-            column_order: Solver::column_order(),
             table: TranspositionTable::new(Solver::TABLE_SIZE),
             book: None,
-            node_count: 0,
+            searched: 0,
         }
     }
 }

@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::BitMask;
 
 fn next_prime(n: usize) -> usize {
     if has_factor(n, 2, n) {
@@ -28,7 +28,7 @@ fn med(min: usize, max: usize) -> usize {
 pub struct TranspositionTable {
     keys: Vec<u32>,
     vals: Vec<i8>,
-    pub size: usize,
+    size: usize,
 }
 
 impl TranspositionTable {
@@ -38,6 +38,15 @@ impl TranspositionTable {
             keys: vec![0; size],
             vals: vec![0; size],
             size,
+        }
+    }
+
+    pub fn from_parts(keys: Vec<u32>, vals: Vec<i8>) -> Self {
+        assert!(keys.len() == vals.len());
+        Self {
+            size: keys.len(),
+            keys,
+            vals,
         }
     }
 
@@ -58,11 +67,7 @@ impl TranspositionTable {
         return (key as usize) % self.size;
     }
 
-    pub(crate) fn get_mut_keys(&mut self) -> &mut Vec<u32> {
-        return &mut self.keys;
-    }
-
-    pub(crate) fn get_mut_values(&mut self) -> &mut Vec<i8> {
-        return &mut self.vals;
+    pub fn size(log_size: usize) -> usize {
+        next_prime(1 << log_size)
     }
 }
