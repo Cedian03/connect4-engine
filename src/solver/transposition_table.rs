@@ -1,9 +1,61 @@
 use num_traits::AsPrimitive;
 
-use crate::{
-    bit_mask,
-    magic::{Bar, BitMask, Foo},
-};
+use crate::{bit_mask, magic::*, position::Position};
+
+#[derive(Debug)]
+pub struct TranspositionTable<const W: usize, const H: usize> {
+    keys: Vec<u32>,
+    vals: Vec<i8>,
+    size: usize,
+}
+
+impl<const W: usize, const H: usize> TranspositionTable<W, H> {
+    pub fn new(log_size: usize) -> Self {
+        let size = table_size(log_size);
+
+        Self {
+            keys: vec![0; size],
+            vals: vec![0; size],
+            size,
+        }
+    }
+
+    pub fn from_parts(keys: Vec<u32>, vals: Vec<i8>) -> Self {
+        assert!(keys.len() == vals.len());
+
+        Self {
+            size: keys.len(),
+            keys,
+            vals,
+        }
+    }
+}
+
+impl<const W: usize, const H: usize> TranspositionTable<W, H>
+where
+    Position<W, H>: AsBitMask,
+{
+    pub fn get(&self, key: bit_mask!(W, H)) -> Option<i32> {
+        let i = self.index(key);
+        (self.keys[i] == key.as_())
+            .then(|| self.vals[i] as i32)
+            .filter(|&v| v != 0)
+    }
+
+    pub fn put(&mut self, key: bit_mask!(W, H), val: i8) {
+        let i = self.index(key);
+        self.keys[i] = key.as_();
+        self.vals[i] = val;
+    }
+
+    fn index(&self, key: bit_mask!(W, H)) -> usize {
+        return <bit_mask!(W, H) as AsPrimitive<usize>>::as_(key) % self.size;
+    }
+}
+
+pub fn table_size(log_size: usize) -> usize {
+    next_prime(1 << log_size)
+}
 
 fn next_prime(n: usize) -> usize {
     if has_factor(n, 2, n) {
@@ -26,59 +78,5 @@ fn has_factor(n: usize, min: usize, max: usize) -> bool {
 }
 
 fn med(min: usize, max: usize) -> usize {
-    return (min + max) / 2;
-}
-
-#[derive(Debug)]
-pub struct TranspositionTable<const W: usize, const H: usize> {
-    keys: Vec<u32>,
-    vals: Vec<i8>,
-    size: usize,
-}
-
-impl<const W: usize, const H: usize> TranspositionTable<W, H> {
-    pub fn new(log_size: usize) -> Self {
-        let size = next_prime(1 << log_size);
-        Self {
-            keys: vec![0; size],
-            vals: vec![0; size],
-            size,
-        }
-    }
-
-    pub fn from_parts(keys: Vec<u32>, vals: Vec<i8>) -> Self {
-        assert!(keys.len() == vals.len());
-        Self {
-            size: keys.len(),
-            keys,
-            vals,
-        }
-    }
-}
-
-impl<const W: usize, const H: usize> TranspositionTable<W, H>
-where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask + AsPrimitive<u32> + AsPrimitive<usize>,
-{
-    pub fn put(&mut self, key: bit_mask!(W, H), val: i8) {
-        let i = self.index(key);
-        self.keys[i] = key.as_();
-        self.vals[i] = val;
-    }
-
-    pub fn get(&self, key: bit_mask!(W, H)) -> Option<i32> {
-        let i = self.index(key);
-        (self.keys[i] == key.as_())
-            .then(|| self.vals[i] as i32)
-            .filter(|&v| v != 0)
-    }
-
-    fn index(&self, key: bit_mask!(W, H)) -> usize {
-        return <bit_mask!(W, H) as AsPrimitive<usize>>::as_(key) % self.size;
-    }
-
-    pub fn size(log_size: usize) -> usize {
-        next_prime(1 << log_size)
-    }
+    return min + (max - min) / 2;
 }

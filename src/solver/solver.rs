@@ -1,14 +1,10 @@
 use std::default;
-use std::path::Path;
 
-use num_traits::{AsPrimitive, PrimInt, Zero};
+use num_traits::{PrimInt, Zero};
+
+use crate::{bit_mask, magic::*, Position};
 
 use super::{MoveSorter, OpeningBook, TranspositionTable};
-use crate::{
-    bit_mask,
-    magic::{Bar, BitMask, Foo},
-    Position, Result,
-};
 
 #[derive(Debug)]
 pub struct Solver<const W: usize, const H: usize> {
@@ -18,13 +14,28 @@ pub struct Solver<const W: usize, const H: usize> {
 }
 
 impl<const W: usize, const H: usize> Solver<W, H> {
-    const TABLE_SIZE: usize = 24;
+    const TABLE_LOG_SIZE: usize = 24;
 
     const MAX_DEPTH: i32 = (W * H) as i32;
     const MIN_SCORE: i32 = -Self::MAX_DEPTH / 2 + 3;
     const MAX_SCORE: i32 = (Self::MAX_DEPTH + 1) / 2 - 3;
 
-    pub const COLUMN_ORDER: [usize; W] = Self::column_order();
+    const COLUMN_ORDER: [usize; W] = Self::column_order();
+
+    pub fn new() -> Self {
+        Default::default()
+    }
+
+    pub fn with_book(book: OpeningBook<W, H>) -> Self {
+        Self {
+            book: Some(book),
+            ..Default::default()
+        }
+    }
+
+    pub fn searched(&self) -> u64 {
+        self.searched
+    }
 
     const fn column_order() -> [usize; W] {
         let mut order = [0; W];
@@ -42,26 +53,12 @@ impl<const W: usize, const H: usize> Solver<W, H> {
 
         order
     }
-
-    pub fn searched(&self) -> u64 {
-        self.searched
-    }
 }
 
 impl<const W: usize, const H: usize> Solver<W, H>
 where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask + AsPrimitive<u32> + AsPrimitive<usize>,
+    Position<W, H>: AsBitMask,
 {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn open<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
-        self.book = Some(OpeningBook::open(path)?);
-        Ok(())
-    }
-
     pub fn analyze(&mut self, position: &Position<W, H>) -> [Option<i32>; W] {
         let mut evals = [None; W];
         for col in 0..W {
@@ -201,7 +198,7 @@ where
 impl<const W: usize, const H: usize> default::Default for Solver<W, H> {
     fn default() -> Self {
         Self {
-            table: TranspositionTable::new(Self::TABLE_SIZE),
+            table: TranspositionTable::new(Self::TABLE_LOG_SIZE),
             book: None,
             searched: 0,
         }

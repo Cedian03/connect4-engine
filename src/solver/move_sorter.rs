@@ -1,14 +1,9 @@
-use num_traits::Zero;
+use crate::{bit_mask, magic::*, position::Position};
 
-use crate::{
-    bit_mask,
-    magic::{Bar, BitMask, Foo},
-};
-
+#[derive(Clone)]
 pub struct MoveSorter<const W: usize, const H: usize>
 where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask,
+    Position<W, H>: AsBitMask,
 {
     len: usize,
     entries: [Entry<W, H>; W],
@@ -16,12 +11,11 @@ where
 
 impl<const W: usize, const H: usize> Default for MoveSorter<W, H>
 where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask,
+    Position<W, H>: AsBitMask,
 {
     fn default() -> Self {
         Self {
-            len: Zero::zero(),
+            len: 0,
             entries: [Default::default(); W],
         }
     }
@@ -30,8 +24,7 @@ where
 #[derive(Copy, Clone)]
 struct Entry<const W: usize, const H: usize>
 where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask,
+    Position<W, H>: AsBitMask,
 {
     mask: bit_mask!(W, H),
     score: u32,
@@ -39,12 +32,11 @@ where
 
 impl<const W: usize, const H: usize> Default for Entry<W, H>
 where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask,
+    Position<W, H>: AsBitMask,
 {
     fn default() -> Self {
         Self {
-            mask: Zero::zero(),
+            mask: 0.into(),
             score: 0,
         }
     }
@@ -52,8 +44,7 @@ where
 
 impl<const W: usize, const H: usize> MoveSorter<W, H>
 where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask,
+    Position<W, H>: AsBitMask,
 {
     pub fn add(&mut self, mask: bit_mask!(W, H), score: u32) {
         let mut pos = self.len;
@@ -68,17 +59,14 @@ where
 
 impl<const W: usize, const H: usize> Iterator for MoveSorter<W, H>
 where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask,
+    Position<W, H>: AsBitMask,
 {
     type Item = bit_mask!(W, H);
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.len > 0 {
+        (self.len > 0).then(|| {
             self.len -= 1;
-            Some(self.entries[self.len].mask)
-        } else {
-            None
-        }
+            self.entries[self.len].mask
+        })
     }
 }

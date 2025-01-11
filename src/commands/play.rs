@@ -1,14 +1,8 @@
-use std::path::PathBuf;
+use crate::{solver::OpeningBook, Position, Result, Solver};
 
-use crate::{Position, Result, Solver};
-
-pub fn play(engine_as_x: bool, engine_as_o: bool, book: Option<PathBuf>) -> Result<()> {
-    let mut position = Position::default();
-    let mut solver = Solver::new();
-
-    if let Some(book) = book {
-        solver.open(book).unwrap();
-    }
+pub fn play(engine_as_x: bool, engine_as_o: bool) -> Result<()> {
+    let mut position = Position::standard();
+    let mut solver = Solver::with_book(OpeningBook::open("./.book")?);
 
     let mut playing = true;
     while playing {

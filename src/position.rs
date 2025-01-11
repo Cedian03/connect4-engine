@@ -1,36 +1,31 @@
-use std::fmt;
-
 use num_traits::{PrimInt, Zero};
 
-use crate::bit_mask;
-
-use crate::magic::{Bar, BitMask, Foo};
+use crate::{bit_mask, magic::*};
 
 #[derive(Clone)]
 pub struct Position<const W: usize = 7, const H: usize = 6>
 where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask,
+    Self: AsBitMask,
 {
     curr: bit_mask!(W, H),
     mask: bit_mask!(W, H),
-    half_turn: i32,
+}
+
+impl Position {
+    pub fn standard() -> Self {
+        Self::default()
+    }
 }
 
 impl<const W: usize, const H: usize> Position<W, H>
 where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask,
+    Self: AsBitMask,
 {
     // pub const BOTTOM_MASK: bit_mask!(W, H) = Self::bottom_mask(); // TODO
     // pub const BOARD_MASK: bit_mask!(W, H) = Self::board_mask(); // TODO
 
     pub fn new() -> Self {
-        Self {
-            curr: Zero::zero(),
-            mask: Zero::zero(),
-            half_turn: 0,
-        }
+        Self::default()
     }
 
     pub const fn width(&self) -> usize {
@@ -56,15 +51,14 @@ where
     pub fn play_mask(&mut self, mask: bit_mask!(W, H)) {
         self.curr ^= self.mask;
         self.mask |= mask;
-        self.half_turn += 1;
     }
 
     pub fn turn(&self) -> i32 {
-        self.half_turn / 2
+        self.half_turn() / 2
     }
 
     pub fn half_turn(&self) -> i32 {
-        self.half_turn
+        self.mask.count_ones() as i32
     }
 
     pub fn possible_non_losing_moves(&self) -> bit_mask!(W, H) {
@@ -219,69 +213,14 @@ where
     }
 }
 
-impl<const W: usize, const H: usize> fmt::Debug for Position<W, H>
+impl<const W: usize, const H: usize> Default for Position<W, H>
 where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask + fmt::Binary,
-{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            concat!("Position {{ curr: {:#b}, mask: {:#b}, half_turn: {} }}"),
-            self.curr, self.mask, self.half_turn
-        )
-    }
-}
-
-impl<const W: usize, const H: usize> fmt::Display for Position<W, H>
-where
-    Foo<W, H>: Bar,
-    <Foo<W, H> as Bar>::Qux: BitMask,
-{
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let (a, b) = if self.half_turn % 2 == 0 {
-            ('X', 'O')
-        } else {
-            ('O', 'X')
-        };
-
-        for row in (0..H).rev() {
-            if row != H - 1 {
-                write!(f, "\n")?;
-            }
-
-            for col in 0..W {
-                if col != 0 {
-                    write!(f, " ")?;
-                }
-
-                let mask = Self::row_mask(row) & Self::col_mask(col);
-
-                if (self.mask & mask) > 0.into() {
-                    if (self.curr & mask) > 0.into() {
-                        write!(f, "{}", a)?;
-                    } else {
-                        write!(f, "{}", b)?;
-                    }
-                } else {
-                    write!(f, ".")?;
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
-impl Default for Position<7, 6>
-where
-    Foo<7, 6>: Bar,
-    <Foo<7, 6> as Bar>::Qux: BitMask,
+    Self: AsBitMask,
 {
     fn default() -> Self {
         Self {
-            curr: 0,
-            mask: 0,
-            half_turn: 0,
+            curr: 0.into(),
+            mask: 0.into(),
         }
     }
 }

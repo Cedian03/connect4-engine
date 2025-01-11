@@ -1,11 +1,11 @@
-use std::{path::PathBuf, time::Instant};
+use std::time::Instant;
 
 use thousands::Separable;
 
 use crate::{Position, Result, Solver};
 
-pub fn eval(seq: &str, book: Option<PathBuf>) -> Result<()> {
-    let mut position = Position::default();
+pub fn eval(seq: &str) -> Result<()> {
+    let mut position = Position::standard();
     let mut solver = Solver::new();
 
     for ch in seq.chars() {
@@ -17,16 +17,10 @@ pub fn eval(seq: &str, book: Option<PathBuf>) -> Result<()> {
         );
     }
 
-    if let Some(book) = book {
-        solver.open(book).unwrap();
-    }
-
     println!(
         "Solving position found by playing the the sequence `{}`",
         seq
     );
-
-    println!("The position:\n{}", position);
 
     let start = Instant::now();
     let evaluation = solver.evaluate(&position);

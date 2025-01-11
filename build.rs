@@ -6,20 +6,19 @@ fn main() {
     match output {
         Ok(output) => {
             if output.status.success() {
-                println!("Python script executed successfully!")
+                println!("Magic script executed successfully!")
             } else {
                 panic!(
-                    "Python script failed with status: {}\nstderr: {}",
+                    "Magic script failed with status: {}\nstderr: {}",
                     output.status,
                     String::from_utf8_lossy(&output.stderr)
                 );
             }
         }
         Err(error) => {
-            panic!("Failed to execute Python script: {}", error)
+            panic!("Failed to execute magic script: {}", error)
         }
     }
 
     println!("cargo:rerun-if-changed=./magic.py");
-    println!("cargo:rerun-if-changed=./magic.rs");
 }

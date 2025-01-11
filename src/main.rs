@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use clap::{Parser, Subcommand};
 
 use error::{Error, Result};
@@ -16,8 +14,6 @@ mod solver;
 struct Cli {
     #[command(subcommand)]
     command: Commands,
-    #[arg(long)]
-    book: Option<PathBuf>,
 }
 
 #[derive(Subcommand)]
@@ -38,7 +34,7 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Eval { seq } => commands::eval(&seq, cli.book),
-        Commands::Play { x, o } => commands::play(x, o, cli.book),
+        Commands::Eval { seq } => commands::eval(&seq),
+        Commands::Play { x, o } => commands::play(x, o),
     }
 }
