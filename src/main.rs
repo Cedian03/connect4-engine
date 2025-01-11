@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 
 use error::{Error, Result};
-use position::{BitMask, Position};
+use position::Position;
 use solver::Solver;
 
 mod commands;
@@ -11,7 +11,6 @@ mod error;
 mod magic;
 mod position;
 mod solver;
-mod util;
 
 #[derive(Parser)]
 struct Cli {

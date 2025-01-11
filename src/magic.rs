@@ -1,519 +1,467 @@
-// No magic; just brute force.
+//! Not really magic is it...
 
-pub struct MagicStruct<const N: usize>;
+use std::ops;
 
-pub trait MagicTrait {
-    type MagicType;
-}
-
-impl MagicTrait for MagicStruct<1> {
-    type MagicType = u8;
-}
-
-impl MagicTrait for MagicStruct<2> {
-    type MagicType = u8;
-}
-
-impl MagicTrait for MagicStruct<3> {
-    type MagicType = u8;
-}
-
-impl MagicTrait for MagicStruct<4> {
-    type MagicType = u8;
-}
-
-impl MagicTrait for MagicStruct<5> {
-    type MagicType = u8;
-}
-
-impl MagicTrait for MagicStruct<6> {
-    type MagicType = u8;
-}
-
-impl MagicTrait for MagicStruct<7> {
-    type MagicType = u8;
-}
-
-impl MagicTrait for MagicStruct<8> {
-    type MagicType = u8;
-}
-
-impl MagicTrait for MagicStruct<9> {
-    type MagicType = u16;
-}
-
-impl MagicTrait for MagicStruct<10> {
-    type MagicType = u16;
-}
-
-impl MagicTrait for MagicStruct<11> {
-    type MagicType = u16;
-}
-
-impl MagicTrait for MagicStruct<12> {
-    type MagicType = u16;
-}
-
-impl MagicTrait for MagicStruct<13> {
-    type MagicType = u16;
-}
+use num_traits::{NumAssign, PrimInt};
 
-impl MagicTrait for MagicStruct<14> {
-    type MagicType = u16;
+#[macro_export]
+macro_rules! bit_mask {
+    ($w:ident, $h:ident) => {
+        <crate::magic::Foo<$w, $h> as crate::magic::Bar>::Qux
+    };
 }
 
-impl MagicTrait for MagicStruct<15> {
-    type MagicType = u16;
+pub trait BitMask:
+    NumAssign
+    + PrimInt
+    + From<u8>
+    + ops::BitAndAssign
+    + ops::BitOrAssign
+    + ops::BitXorAssign
+    + ops::ShlAssign
+    + ops::ShlAssign<usize>
+    + ops::ShrAssign
+    + ops::ShrAssign<usize>
+{
 }
 
-impl MagicTrait for MagicStruct<16> {
-    type MagicType = u16;
+impl<T> BitMask for T where
+    T: NumAssign
+        + PrimInt
+        + From<u8>
+        + ops::BitAndAssign
+        + ops::BitOrAssign
+        + ops::BitXorAssign
+        + ops::ShlAssign
+        + ops::ShlAssign<usize>
+        + ops::ShrAssign
+        + ops::ShrAssign<usize>
+{
 }
 
-impl MagicTrait for MagicStruct<17> {
-    type MagicType = u32;
-}
-
-impl MagicTrait for MagicStruct<18> {
-    type MagicType = u32;
-}
-
-impl MagicTrait for MagicStruct<19> {
-    type MagicType = u32;
-}
+pub struct Foo<const W: usize, const H: usize>;
 
-impl MagicTrait for MagicStruct<20> {
-    type MagicType = u32;
+pub trait Bar {
+    type Qux;
 }
 
-impl MagicTrait for MagicStruct<21> {
-    type MagicType = u32;
+impl Bar for Foo<4, 4> {
+    type Qux = u32;
 }
 
-impl MagicTrait for MagicStruct<22> {
-    type MagicType = u32;
+impl Bar for Foo<4, 5> {
+    type Qux = u32;
 }
 
-impl MagicTrait for MagicStruct<23> {
-    type MagicType = u32;
+impl Bar for Foo<4, 6> {
+    type Qux = u32;
 }
 
-impl MagicTrait for MagicStruct<24> {
-    type MagicType = u32;
+impl Bar for Foo<4, 7> {
+    type Qux = u32;
 }
 
-impl MagicTrait for MagicStruct<25> {
-    type MagicType = u32;
+impl Bar for Foo<4, 8> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<26> {
-    type MagicType = u32;
+impl Bar for Foo<4, 9> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<27> {
-    type MagicType = u32;
+impl Bar for Foo<4, 10> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<28> {
-    type MagicType = u32;
+impl Bar for Foo<4, 11> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<29> {
-    type MagicType = u32;
+impl Bar for Foo<4, 12> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<30> {
-    type MagicType = u32;
+impl Bar for Foo<4, 13> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<31> {
-    type MagicType = u32;
+impl Bar for Foo<4, 14> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<32> {
-    type MagicType = u32;
+impl Bar for Foo<4, 15> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<33> {
-    type MagicType = u64;
+impl Bar for Foo<5, 4> {
+    type Qux = u32;
 }
 
-impl MagicTrait for MagicStruct<34> {
-    type MagicType = u64;
+impl Bar for Foo<5, 5> {
+    type Qux = u32;
 }
 
-impl MagicTrait for MagicStruct<35> {
-    type MagicType = u64;
+impl Bar for Foo<5, 6> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<36> {
-    type MagicType = u64;
+impl Bar for Foo<5, 7> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<37> {
-    type MagicType = u64;
+impl Bar for Foo<5, 8> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<38> {
-    type MagicType = u64;
+impl Bar for Foo<5, 9> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<39> {
-    type MagicType = u64;
+impl Bar for Foo<5, 10> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<40> {
-    type MagicType = u64;
+impl Bar for Foo<5, 11> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<41> {
-    type MagicType = u64;
+impl Bar for Foo<5, 12> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<42> {
-    type MagicType = u64;
+impl Bar for Foo<5, 13> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<43> {
-    type MagicType = u64;
+impl Bar for Foo<5, 14> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<44> {
-    type MagicType = u64;
+impl Bar for Foo<5, 15> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<45> {
-    type MagicType = u64;
+impl Bar for Foo<6, 4> {
+    type Qux = u32;
 }
 
-impl MagicTrait for MagicStruct<46> {
-    type MagicType = u64;
+impl Bar for Foo<6, 5> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<47> {
-    type MagicType = u64;
+impl Bar for Foo<6, 6> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<48> {
-    type MagicType = u64;
+impl Bar for Foo<6, 7> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<49> {
-    type MagicType = u64;
+impl Bar for Foo<6, 8> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<50> {
-    type MagicType = u64;
+impl Bar for Foo<6, 9> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<51> {
-    type MagicType = u64;
+impl Bar for Foo<6, 10> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<52> {
-    type MagicType = u64;
+impl Bar for Foo<6, 11> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<53> {
-    type MagicType = u64;
+impl Bar for Foo<6, 12> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<54> {
-    type MagicType = u64;
+impl Bar for Foo<6, 13> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<55> {
-    type MagicType = u64;
+impl Bar for Foo<6, 14> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<56> {
-    type MagicType = u64;
+impl Bar for Foo<6, 15> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<57> {
-    type MagicType = u64;
+impl Bar for Foo<7, 4> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<58> {
-    type MagicType = u64;
+impl Bar for Foo<7, 5> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<59> {
-    type MagicType = u64;
+impl Bar for Foo<7, 6> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<60> {
-    type MagicType = u64;
+impl Bar for Foo<7, 7> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<61> {
-    type MagicType = u64;
+impl Bar for Foo<7, 8> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<62> {
-    type MagicType = u64;
+impl Bar for Foo<7, 9> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<63> {
-    type MagicType = u64;
+impl Bar for Foo<7, 10> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<64> {
-    type MagicType = u64;
+impl Bar for Foo<7, 11> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<65> {
-    type MagicType = u128;
+impl Bar for Foo<7, 12> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<66> {
-    type MagicType = u128;
+impl Bar for Foo<7, 13> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<67> {
-    type MagicType = u128;
+impl Bar for Foo<7, 14> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<68> {
-    type MagicType = u128;
+impl Bar for Foo<7, 15> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<69> {
-    type MagicType = u128;
+impl Bar for Foo<8, 4> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<70> {
-    type MagicType = u128;
+impl Bar for Foo<8, 5> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<71> {
-    type MagicType = u128;
+impl Bar for Foo<8, 6> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<72> {
-    type MagicType = u128;
+impl Bar for Foo<8, 7> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<73> {
-    type MagicType = u128;
+impl Bar for Foo<8, 8> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<74> {
-    type MagicType = u128;
+impl Bar for Foo<8, 9> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<75> {
-    type MagicType = u128;
+impl Bar for Foo<8, 10> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<76> {
-    type MagicType = u128;
+impl Bar for Foo<8, 11> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<77> {
-    type MagicType = u128;
+impl Bar for Foo<8, 12> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<78> {
-    type MagicType = u128;
+impl Bar for Foo<8, 13> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<79> {
-    type MagicType = u128;
+impl Bar for Foo<8, 14> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<80> {
-    type MagicType = u128;
+impl Bar for Foo<8, 15> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<81> {
-    type MagicType = u128;
+impl Bar for Foo<9, 4> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<82> {
-    type MagicType = u128;
+impl Bar for Foo<9, 5> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<83> {
-    type MagicType = u128;
+impl Bar for Foo<9, 6> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<84> {
-    type MagicType = u128;
+impl Bar for Foo<9, 7> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<85> {
-    type MagicType = u128;
+impl Bar for Foo<9, 8> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<86> {
-    type MagicType = u128;
+impl Bar for Foo<9, 9> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<87> {
-    type MagicType = u128;
+impl Bar for Foo<9, 10> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<88> {
-    type MagicType = u128;
+impl Bar for Foo<9, 11> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<89> {
-    type MagicType = u128;
+impl Bar for Foo<9, 12> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<90> {
-    type MagicType = u128;
+impl Bar for Foo<9, 13> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<91> {
-    type MagicType = u128;
+impl Bar for Foo<10, 4> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<92> {
-    type MagicType = u128;
+impl Bar for Foo<10, 5> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<93> {
-    type MagicType = u128;
+impl Bar for Foo<10, 6> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<94> {
-    type MagicType = u128;
+impl Bar for Foo<10, 7> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<95> {
-    type MagicType = u128;
+impl Bar for Foo<10, 8> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<96> {
-    type MagicType = u128;
+impl Bar for Foo<10, 9> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<97> {
-    type MagicType = u128;
+impl Bar for Foo<10, 10> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<98> {
-    type MagicType = u128;
+impl Bar for Foo<10, 11> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<99> {
-    type MagicType = u128;
+impl Bar for Foo<11, 4> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<100> {
-    type MagicType = u128;
+impl Bar for Foo<11, 5> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<101> {
-    type MagicType = u128;
+impl Bar for Foo<11, 6> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<102> {
-    type MagicType = u128;
+impl Bar for Foo<11, 7> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<103> {
-    type MagicType = u128;
+impl Bar for Foo<11, 8> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<104> {
-    type MagicType = u128;
+impl Bar for Foo<11, 9> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<105> {
-    type MagicType = u128;
+impl Bar for Foo<11, 10> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<106> {
-    type MagicType = u128;
+impl Bar for Foo<12, 4> {
+    type Qux = u64;
 }
 
-impl MagicTrait for MagicStruct<107> {
-    type MagicType = u128;
+impl Bar for Foo<12, 5> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<108> {
-    type MagicType = u128;
+impl Bar for Foo<12, 6> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<109> {
-    type MagicType = u128;
+impl Bar for Foo<12, 7> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<110> {
-    type MagicType = u128;
+impl Bar for Foo<12, 8> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<111> {
-    type MagicType = u128;
+impl Bar for Foo<12, 9> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<112> {
-    type MagicType = u128;
+impl Bar for Foo<13, 4> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<113> {
-    type MagicType = u128;
+impl Bar for Foo<13, 5> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<114> {
-    type MagicType = u128;
+impl Bar for Foo<13, 6> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<115> {
-    type MagicType = u128;
+impl Bar for Foo<13, 7> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<116> {
-    type MagicType = u128;
+impl Bar for Foo<13, 8> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<117> {
-    type MagicType = u128;
+impl Bar for Foo<14, 4> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<118> {
-    type MagicType = u128;
+impl Bar for Foo<14, 5> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<119> {
-    type MagicType = u128;
+impl Bar for Foo<14, 6> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<120> {
-    type MagicType = u128;
+impl Bar for Foo<14, 7> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<121> {
-    type MagicType = u128;
+impl Bar for Foo<14, 8> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<122> {
-    type MagicType = u128;
+impl Bar for Foo<15, 4> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<123> {
-    type MagicType = u128;
+impl Bar for Foo<15, 5> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<124> {
-    type MagicType = u128;
+impl Bar for Foo<15, 6> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<125> {
-    type MagicType = u128;
+impl Bar for Foo<15, 7> {
+    type Qux = u128;
 }
 
-impl MagicTrait for MagicStruct<126> {
-    type MagicType = u128;
-}
-
-impl MagicTrait for MagicStruct<127> {
-    type MagicType = u128;
-}
-
-impl MagicTrait for MagicStruct<128> {
-    type MagicType = u128;
-}

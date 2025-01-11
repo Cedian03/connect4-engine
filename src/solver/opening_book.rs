@@ -2,17 +2,26 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
+use num_traits::AsPrimitive;
+
 use super::TranspositionTable;
-use crate::{Error, Position, Result};
+use crate::{
+    magic::{Bar, BitMask, Foo},
+    Error, Position, Result,
+};
 
 #[derive(Debug)]
-pub struct OpeningBook {
-    table: TranspositionTable,
+pub struct OpeningBook<const W: usize, const H: usize> {
+    table: TranspositionTable<W, H>,
     depth: usize,
 }
 
-impl OpeningBook {
-    pub fn load<P: AsRef<Path>>(path: P) -> Result<Self> {
+impl<const W: usize, const H: usize> OpeningBook<W, H>
+where
+    Foo<W, H>: Bar,
+    <Foo<W, H> as Bar>::Qux: BitMask + AsPrimitive<u32> + AsPrimitive<usize>,
+{
+    pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
         let mut f = File::open(path)?;
 
         let mut meta_buf = [0; 6];
@@ -25,13 +34,13 @@ impl OpeningBook {
         let val_size = meta_buf[4] as usize;
         let log_size = meta_buf[5] as usize;
 
-        (width == Position::WIDTH)
+        (width == W)
             .then(|| ())
             .ok_or(Error::LoadBook("Invaild width".to_string()))?;
-        (height == Position::HEIGHT)
+        (height == H)
             .then(|| ())
             .ok_or(Error::LoadBook("Invalid height".to_string()))?;
-        (depth <= Position::WIDTH * Position::HEIGHT)
+        (depth <= W * H)
             .then(|| ())
             .ok_or(Error::LoadBook("Invalid depth".to_string()))?;
         (key_size == 1)
@@ -65,7 +74,7 @@ impl OpeningBook {
         })
     }
 
-    pub fn get(&self, p: &Position) -> Option<i32> {
+    pub fn get(&self, p: &Position<W, H>) -> Option<i32> {
         if p.half_turn() <= self.depth as i32 {
             return self.table.get(p.key_3());
         } else {

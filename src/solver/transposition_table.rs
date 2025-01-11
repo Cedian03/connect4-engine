@@ -1,4 +1,9 @@
-use crate::BitMask;
+use num_traits::AsPrimitive;
+
+use crate::{
+    bit_mask,
+    magic::{Bar, BitMask, Foo},
+};
 
 fn next_prime(n: usize) -> usize {
     if has_factor(n, 2, n) {
@@ -25,13 +30,13 @@ fn med(min: usize, max: usize) -> usize {
 }
 
 #[derive(Debug)]
-pub struct TranspositionTable {
+pub struct TranspositionTable<const W: usize, const H: usize> {
     keys: Vec<u32>,
     vals: Vec<i8>,
     size: usize,
 }
 
-impl TranspositionTable {
+impl<const W: usize, const H: usize> TranspositionTable<W, H> {
     pub fn new(log_size: usize) -> Self {
         let size = next_prime(1 << log_size);
         Self {
@@ -49,22 +54,28 @@ impl TranspositionTable {
             vals,
         }
     }
+}
 
-    pub fn put(&mut self, key: BitMask, val: i8) {
+impl<const W: usize, const H: usize> TranspositionTable<W, H>
+where
+    Foo<W, H>: Bar,
+    <Foo<W, H> as Bar>::Qux: BitMask + AsPrimitive<u32> + AsPrimitive<usize>,
+{
+    pub fn put(&mut self, key: bit_mask!(W, H), val: i8) {
         let i = self.index(key);
-        self.keys[i] = key as u32;
+        self.keys[i] = key.as_();
         self.vals[i] = val;
     }
 
-    pub fn get(&self, key: BitMask) -> Option<i32> {
+    pub fn get(&self, key: bit_mask!(W, H)) -> Option<i32> {
         let i = self.index(key);
-        (self.keys[i] == key as u32)
+        (self.keys[i] == key.as_())
             .then(|| self.vals[i] as i32)
             .filter(|&v| v != 0)
     }
 
-    fn index(&self, key: BitMask) -> usize {
-        return (key as usize) % self.size;
+    fn index(&self, key: bit_mask!(W, H)) -> usize {
+        return <bit_mask!(W, H) as AsPrimitive<usize>>::as_(key) % self.size;
     }
 
     pub fn size(log_size: usize) -> usize {

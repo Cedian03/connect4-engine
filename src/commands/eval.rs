@@ -2,24 +2,31 @@ use std::{path::PathBuf, time::Instant};
 
 use thousands::Separable;
 
-use crate::{util::char_to_col, Position, Result, Solver};
+use crate::{Position, Result, Solver};
 
 pub fn eval(seq: &str, book: Option<PathBuf>) -> Result<()> {
     let mut position = Position::default();
     let mut solver = Solver::new();
 
     for ch in seq.chars() {
-        position.play_col(char_to_col(ch)?);
+        position.play_col(
+            (ch as usize)
+                .checked_sub('A' as usize)
+                .filter(|x| *x < position.width())
+                .unwrap(),
+        );
     }
 
     if let Some(book) = book {
-        solver.load_book(book).unwrap();
+        solver.open(book).unwrap();
     }
 
     println!(
         "Solving position found by playing the the sequence `{}`",
         seq
     );
+
+    println!("The position:\n{}", position);
 
     let start = Instant::now();
     let evaluation = solver.evaluate(&position);

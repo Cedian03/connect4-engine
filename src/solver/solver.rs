@@ -1,41 +1,70 @@
 use std::default;
 use std::path::Path;
 
+use num_traits::{AsPrimitive, PrimInt, Zero};
+
 use super::{MoveSorter, OpeningBook, TranspositionTable};
-use crate::{BitMask, Position, Result};
+use crate::{
+    bit_mask,
+    magic::{Bar, BitMask, Foo},
+    Position, Result,
+};
 
 #[derive(Debug)]
-pub struct Solver {
-    table: TranspositionTable,
-    book: Option<OpeningBook>,
+pub struct Solver<const W: usize, const H: usize> {
+    table: TranspositionTable<W, H>,
+    book: Option<OpeningBook<W, H>>,
     searched: u64,
 }
 
-impl Solver {
+impl<const W: usize, const H: usize> Solver<W, H> {
     const TABLE_SIZE: usize = 24;
 
-    const MAX_DEPTH: i32 = (Position::WIDTH * Position::HEIGHT) as i32;
+    const MAX_DEPTH: i32 = (W * H) as i32;
     const MIN_SCORE: i32 = -Self::MAX_DEPTH / 2 + 3;
     const MAX_SCORE: i32 = (Self::MAX_DEPTH + 1) / 2 - 3;
 
-    pub const COLUMN_ORDER: [usize; Position::WIDTH] = Self::column_order();
+    pub const COLUMN_ORDER: [usize; W] = Self::column_order();
 
-    pub fn new() -> Self {
-        Self::default()
+    const fn column_order() -> [usize; W] {
+        let mut order = [0; W];
+
+        let mut i = 0;
+        while i < W {
+            order[i] = match i % 2 {
+                0 => W / 2 + (i / 2),
+                1 => W / 2 - (i / 2 + 1),
+                _ => unreachable!(),
+            };
+
+            i += 1;
+        }
+
+        order
     }
 
     pub fn searched(&self) -> u64 {
         self.searched
     }
+}
 
-    pub fn load_book<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
-        self.book = Some(OpeningBook::load(path)?);
+impl<const W: usize, const H: usize> Solver<W, H>
+where
+    Foo<W, H>: Bar,
+    <Foo<W, H> as Bar>::Qux: BitMask + AsPrimitive<u32> + AsPrimitive<usize>,
+{
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn open<P: AsRef<Path>>(&mut self, path: P) -> Result<()> {
+        self.book = Some(OpeningBook::open(path)?);
         Ok(())
     }
 
-    pub fn analyze(&mut self, position: &Position) -> [Option<i32>; Position::WIDTH] {
-        let mut evals = [None; Position::WIDTH];
-        for col in 0..Position::WIDTH {
+    pub fn analyze(&mut self, position: &Position<W, H>) -> [Option<i32>; W] {
+        let mut evals = [None; W];
+        for col in 0..W {
             if position.can_play_col(col) {
                 let mut new_position = position.clone();
                 new_position.play_col(col);
@@ -47,7 +76,7 @@ impl Solver {
         evals
     }
 
-    pub fn evaluate(&mut self, position: &Position) -> i32 {
+    pub fn evaluate(&mut self, position: &Position<W, H>) -> i32 {
         if position.can_win_next() {
             return (Self::MAX_DEPTH + 1 - position.half_turn()) / 2;
         }
@@ -75,14 +104,14 @@ impl Solver {
         min
     }
 
-    fn negamax(&mut self, position: &Position, mut alpha: i32, mut beta: i32) -> i32 {
+    fn negamax(&mut self, position: &Position<W, H>, mut alpha: i32, mut beta: i32) -> i32 {
         assert!(alpha < beta);
         assert!(!position.can_win_next());
 
         self.searched += 1;
 
         let possible = position.possible_non_losing_moves();
-        if possible == 0 {
+        if possible.is_zero() {
             return -(Self::MAX_DEPTH - position.half_turn()) / 2;
         }
 
@@ -134,14 +163,14 @@ impl Solver {
         }
 
         let mut moves = MoveSorter::default();
-        for i in (0..Position::WIDTH).rev() {
+        for i in (0..W).rev() {
             let mask = possible & Position::col_mask(Self::COLUMN_ORDER[i]);
-            if mask != 0 {
+            if !(mask.is_zero()) {
                 moves.add(mask, Self::score(position, mask));
             }
         }
 
-        while let Some(next) = moves.get_next() {
+        for next in moves {
             let mut position2 = position.clone();
             position2.play_mask(next);
             let score = -self.negamax(&position2, -beta, -alpha);
@@ -163,33 +192,16 @@ impl Solver {
         alpha
     }
 
-    const fn score(position: &Position, mask: BitMask) -> u32 {
-        Position::compute_winning_positions(position.position() | mask, position.mask())
+    fn score(position: &Position<W, H>, mask: bit_mask!(W, H)) -> u32 {
+        Position::<W, H>::compute_winning_positions(position.curr() | mask, position.mask())
             .count_ones()
-    }
-
-    const fn column_order() -> [usize; Position::WIDTH] {
-        let mut order = [0; Position::WIDTH];
-
-        let mut i = 0;
-        while i < Position::WIDTH {
-            order[i] = match i % 2 {
-                0 => Position::WIDTH / 2 + (i / 2),
-                1 => Position::WIDTH / 2 - (i / 2 + 1),
-                _ => unreachable!(),
-            };
-
-            i += 1;
-        }
-
-        order
     }
 }
 
-impl default::Default for Solver {
+impl<const W: usize, const H: usize> default::Default for Solver<W, H> {
     fn default() -> Self {
         Self {
-            table: TranspositionTable::new(Solver::TABLE_SIZE),
+            table: TranspositionTable::new(Self::TABLE_SIZE),
             book: None,
             searched: 0,
         }
