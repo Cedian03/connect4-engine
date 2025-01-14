@@ -6,6 +6,7 @@ use std::{fmt, ops};
 
 use crate::magic::*;
 
+#[derive(Default)]
 pub struct Board<const W: usize, const H: usize>(BitBoard<W, H>)
 where
     BitBoard<W, H>: AsBitMask;
