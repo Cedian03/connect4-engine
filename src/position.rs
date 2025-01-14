@@ -7,8 +7,8 @@ pub struct Position<const W: usize = 7, const H: usize = 6>
 where
     Self: AsBitMask,
 {
-    curr: bit_mask!(W, H),
-    mask: bit_mask!(W, H),
+    pub(crate) curr: bit_mask!(W, H),
+    pub(crate) mask: bit_mask!(W, H),
 }
 
 impl Position {
@@ -62,7 +62,7 @@ where
     }
 
     pub fn possible_non_losing_moves(&self) -> bit_mask!(W, H) {
-        let mut possible_mask = self.possible();
+        let mut possible_mask = self.possible_mask();
         let opponent_win = self.opponent_winning_positions();
         let forced_moves = possible_mask & opponent_win;
 
@@ -81,20 +81,24 @@ where
         (self.mask & Position::col_top_mask(col)).is_zero()
     }
 
-    pub fn possible_mask_col(&self, col: usize) -> bit_mask!(W, H) {
-        self.possible() & Position::col_mask(col)
+    pub fn possible_row_in_col(&self, col: usize) -> usize {
+        (self.possible_mask_col(col).trailing_zeros() % (H as u32 + 1)) as usize
     }
 
-    pub fn possible(&self) -> bit_mask!(W, H) {
+    pub fn possible_mask_col(&self, col: usize) -> bit_mask!(W, H) {
+        self.possible_mask() & Position::col_mask(col)
+    }
+
+    pub fn possible_mask(&self) -> bit_mask!(W, H) {
         (self.mask + Self::bottom_mask()) & Self::board_mask()
     }
 
     pub fn can_win_next(&self) -> bool {
-        !((self.winning_positions() & self.possible()).is_zero())
+        !((self.winning_positions() & self.possible_mask()).is_zero())
     }
 
     pub fn is_winning_col(&self, col: usize) -> bool {
-        !((self.winning_positions() & self.possible() & Position::col_mask(col)).is_zero())
+        !((self.winning_positions() & self.possible_mask() & Position::col_mask(col)).is_zero())
     }
 
     pub fn winning_positions(&self) -> bit_mask!(W, H) {
@@ -177,15 +181,11 @@ where
     }
 
     pub fn col_top_mask(col: usize) -> bit_mask!(W, H) {
-        <bit_mask!(W, H)>::from(1) << ((H - 1) + col * (H + 1))
+        <bit_mask!(W, H)>::from(1) << (col * (H + 1) + (H - 1))
     }
 
     pub fn col_bot_mask(col: usize) -> bit_mask!(W, H) {
         <bit_mask!(W, H)>::from(1) << col * (H + 1)
-    }
-
-    pub fn row_mask(row: usize) -> bit_mask!(W, H) {
-        Self::bottom_mask() << row
     }
 
     pub fn col_mask(col: usize) -> bit_mask!(W, H) {

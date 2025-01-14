@@ -23,18 +23,20 @@ impl<const W: usize, const H: usize> Solver<W, H> {
     const COLUMN_ORDER: [usize; W] = Self::column_order();
 
     pub fn new() -> Self {
-        Default::default()
+        Self::default()
     }
 
-    pub fn with_book(book: OpeningBook<W, H>) -> Self {
-        Self {
-            book: Some(book),
-            ..Default::default()
-        }
+    pub fn with_book(mut self, book: OpeningBook<W, H>) -> Self {
+        self.book = Some(book);
+        self
     }
 
     pub fn searched(&self) -> u64 {
         self.searched
+    }
+
+    pub fn clear(&mut self) {
+        self.table.clear()
     }
 
     const fn column_order() -> [usize; W] {
@@ -190,7 +192,7 @@ where
     }
 
     fn score(position: &Position<W, H>, mask: bit_mask!(W, H)) -> u32 {
-        Position::<W, H>::compute_winning_positions(position.curr() | mask, position.mask())
+        Position::<W, H>::compute_winning_positions(position.curr | mask, position.mask)
             .count_ones()
     }
 }

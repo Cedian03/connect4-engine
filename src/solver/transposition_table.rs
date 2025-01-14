@@ -29,6 +29,11 @@ impl<const W: usize, const H: usize> TranspositionTable<W, H> {
             vals,
         }
     }
+
+    pub fn clear(&mut self) {
+        self.keys.iter_mut().for_each(|x| *x = 0);
+        self.vals.iter_mut().for_each(|x| *x = 0);
+    }
 }
 
 impl<const W: usize, const H: usize> TranspositionTable<W, H>

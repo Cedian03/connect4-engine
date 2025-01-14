@@ -25,9 +25,10 @@ fn main() {
         }
     }
 
-    let mut solver = (!cli.no_book)
-        .then(|| Solver::with_book(OpeningBook::open("./.book").unwrap()))
-        .unwrap_or_default();
+    let mut solver = Solver::new();
+    if !cli.no_book {
+        solver = solver.with_book(OpeningBook::open("./.book").expect("missplaced opening book"))
+    }
 
     let start = Instant::now();
     let evaluation = solver.evaluate(&position);
