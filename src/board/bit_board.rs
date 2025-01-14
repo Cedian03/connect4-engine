@@ -181,6 +181,10 @@ where
         <bit_mask!(W, H)>::from(1) << (col * (H + 1) + (H - 1))
     }
 
+    pub fn cell_mask(col: usize, row: usize) -> bit_mask!(W, H) {
+        <bit_mask!(W, H)>::from(1) << (col * (H + 1) + row)
+    }
+
     pub fn col_bot_mask(col: usize) -> bit_mask!(W, H) {
         <bit_mask!(W, H)>::from(1) << col * (H + 1)
     }

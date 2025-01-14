@@ -1,6 +1,6 @@
 use num_traits::AsPrimitive;
 
-use crate::{bit_board::BitBoard, bit_mask, magic::*};
+use crate::{bit_mask, board::BitBoard, magic::*};
 
 #[derive(Debug)]
 pub struct TranspositionTable<const W: usize, const H: usize> {

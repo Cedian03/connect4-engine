@@ -5,7 +5,7 @@ use num_traits::{AsPrimitive, NumAssign, PrimInt};
 #[macro_export]
 macro_rules! bit_mask {
     ($w:ident, $h:ident) => {
-        <$crate::bit_board::BitBoard<$w, $h> as $crate::magic::AsBitMask>::BitMask
+        <$crate::board::BitBoard<$w, $h> as $crate::magic::AsBitMask>::BitMask
     };
 }
 

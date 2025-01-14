@@ -2,7 +2,11 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-use crate::{magic::*, Error, BitBoard, Result};
+use crate::{
+    board::BitBoard,
+    error::{Error, Result},
+    magic::*,
+};
 
 use super::{table_size, TranspositionTable};
 

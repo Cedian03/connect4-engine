@@ -2,7 +2,7 @@ use std::default;
 
 use num_traits::{PrimInt, Zero};
 
-use crate::{bit_mask, magic::*, BitBoard};
+use crate::{bit_mask, board::BitBoard, magic::*};
 
 use super::{MoveSorter, OpeningBook, TranspositionTable};
 

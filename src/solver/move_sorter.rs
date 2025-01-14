@@ -1,4 +1,4 @@
-use crate::{bit_board::BitBoard, bit_mask, magic::*};
+use crate::{bit_mask, board::BitBoard, magic::*};
 
 #[derive(Clone)]
 pub struct MoveSorter<const W: usize, const H: usize>

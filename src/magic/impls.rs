@@ -1,4 +1,4 @@
-use crate::bit_board::BitBoard;
+use crate::board::BitBoard;
 
 use super::AsBitMask;
 

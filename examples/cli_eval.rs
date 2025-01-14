@@ -2,7 +2,10 @@ use std::time::Instant;
 
 use clap::Parser;
 
-use connect4_engine::{OpeningBook, BitBoard, Solver};
+use connect4_engine::{
+    board::BitBoard,
+    solver::{OpeningBook, Solver},
+};
 
 #[derive(Parser)]
 struct Cli {

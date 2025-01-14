@@ -1,7 +1,7 @@
 OUTPUT_PATH = "./src/magic/impls.rs"
 
 HEAD = """\
-use crate::bit_board::BitBoard;
+use crate::board::BitBoard;
 
 use super::AsBitMask;\
 """
