@@ -8,6 +8,7 @@ build = "build.rs"
 
 [dependencies]
 thiserror = "1"
-clap = { version = "4.0", features = ["derive"] }
-thousands = "0.2.0"
 num-traits = "0.2.19"
+
+[dev-dependencies]
+clap = { version = "4.0", features = ["derive"] }
