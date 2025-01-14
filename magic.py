@@ -1,15 +1,15 @@
 OUTPUT_PATH = "./src/magic/impls.rs"
 
 HEAD = """\
-use crate::position::Position;
+use crate::bit_board::BitBoard;
 
-use super::AsBitMask;
+use super::AsBitMask;\
 """
 
 IMPL = """
-impl AsBitMask for Position<{w}, {h}> {{
+impl AsBitMask for BitBoard<{w}, {h}> {{
     type BitMask = {mask_type};
-}}
+}}\
 """
 
 

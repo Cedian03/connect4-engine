@@ -2,7 +2,7 @@ use std::default;
 
 use num_traits::{PrimInt, Zero};
 
-use crate::{bit_mask, magic::*, Position};
+use crate::{bit_mask, magic::*, BitBoard};
 
 use super::{MoveSorter, OpeningBook, TranspositionTable};
 
@@ -59,9 +59,9 @@ impl<const W: usize, const H: usize> Solver<W, H> {
 
 impl<const W: usize, const H: usize> Solver<W, H>
 where
-    Position<W, H>: AsBitMask,
+    BitBoard<W, H>: AsBitMask,
 {
-    pub fn analyze(&mut self, position: &Position<W, H>) -> [Option<i32>; W] {
+    pub fn analyze(&mut self, position: &BitBoard<W, H>) -> [Option<i32>; W] {
         let mut evals = [None; W];
         for col in 0..W {
             if position.can_play_col(col) {
@@ -75,7 +75,7 @@ where
         evals
     }
 
-    pub fn evaluate(&mut self, position: &Position<W, H>) -> i32 {
+    pub fn evaluate(&mut self, position: &BitBoard<W, H>) -> i32 {
         if position.can_win_next() {
             return (Self::MAX_DEPTH + 1 - position.half_turn()) / 2;
         }
@@ -103,7 +103,7 @@ where
         min
     }
 
-    fn negamax(&mut self, position: &Position<W, H>, mut alpha: i32, mut beta: i32) -> i32 {
+    fn negamax(&mut self, position: &BitBoard<W, H>, mut alpha: i32, mut beta: i32) -> i32 {
         assert!(alpha < beta);
         assert!(!position.can_win_next());
 
@@ -163,7 +163,7 @@ where
 
         let mut moves = MoveSorter::default();
         for i in (0..W).rev() {
-            let mask = possible & Position::col_mask(Self::COLUMN_ORDER[i]);
+            let mask = possible & BitBoard::col_mask(Self::COLUMN_ORDER[i]);
             if !(mask.is_zero()) {
                 moves.add(mask, Self::score(position, mask));
             }
@@ -191,9 +191,8 @@ where
         alpha
     }
 
-    fn score(position: &Position<W, H>, mask: bit_mask!(W, H)) -> u32 {
-        Position::<W, H>::compute_winning_positions(position.curr | mask, position.mask)
-            .count_ones()
+    fn score(position: &BitBoard<W, H>, mask: bit_mask!(W, H)) -> u32 {
+        BitBoard::<W, H>::compute_winning_cells(position.curr | mask, position.mask).count_ones()
     }
 }
 

@@ -3,7 +3,7 @@ use num_traits::{PrimInt, Zero};
 use crate::{bit_mask, magic::*};
 
 #[derive(Clone)]
-pub struct Position<const W: usize = 7, const H: usize = 6>
+pub struct BitBoard<const W: usize = 7, const H: usize = 6>
 where
     Self: AsBitMask,
 {
@@ -11,13 +11,13 @@ where
     pub(crate) mask: bit_mask!(W, H),
 }
 
-impl Position {
+impl BitBoard {
     pub fn standard() -> Self {
         Self::default()
     }
 }
 
-impl<const W: usize, const H: usize> Position<W, H>
+impl<const W: usize, const H: usize> BitBoard<W, H>
 where
     Self: AsBitMask,
 {
@@ -63,7 +63,7 @@ where
 
     pub fn possible_non_losing_moves(&self) -> bit_mask!(W, H) {
         let mut possible_mask = self.possible_mask();
-        let opponent_win = self.opponent_winning_positions();
+        let opponent_win = self.opponent_winning_cells();
         let forced_moves = possible_mask & opponent_win;
 
         if !(forced_moves.is_zero()) {
@@ -78,7 +78,7 @@ where
     }
 
     pub fn can_play_col(&self, col: usize) -> bool {
-        (self.mask & Position::col_top_mask(col)).is_zero()
+        (self.mask & BitBoard::col_top_mask(col)).is_zero()
     }
 
     pub fn possible_row_in_col(&self, col: usize) -> usize {
@@ -86,7 +86,7 @@ where
     }
 
     pub fn possible_mask_col(&self, col: usize) -> bit_mask!(W, H) {
-        self.possible_mask() & Position::col_mask(col)
+        self.possible_mask() & BitBoard::col_mask(col)
     }
 
     pub fn possible_mask(&self) -> bit_mask!(W, H) {
@@ -94,51 +94,48 @@ where
     }
 
     pub fn can_win_next(&self) -> bool {
-        !((self.winning_positions() & self.possible_mask()).is_zero())
+        !((self.winning_cells() & self.possible_mask()).is_zero())
     }
 
     pub fn is_winning_col(&self, col: usize) -> bool {
-        !((self.winning_positions() & self.possible_mask() & Position::col_mask(col)).is_zero())
+        !((self.winning_cells() & self.possible_mask() & BitBoard::col_mask(col)).is_zero())
     }
 
-    pub fn winning_positions(&self) -> bit_mask!(W, H) {
-        Position::compute_winning_positions(self.curr, self.mask)
+    pub fn winning_cells(&self) -> bit_mask!(W, H) {
+        BitBoard::compute_winning_cells(self.curr, self.mask)
     }
 
-    pub fn opponent_winning_positions(&self) -> bit_mask!(W, H) {
-        Position::compute_winning_positions(self.curr ^ self.mask, self.mask)
+    pub fn opponent_winning_cells(&self) -> bit_mask!(W, H) {
+        BitBoard::compute_winning_cells(self.curr ^ self.mask, self.mask)
     }
 
-    pub fn compute_winning_positions(
-        position: bit_mask!(W, H),
-        mask: bit_mask!(W, H),
-    ) -> bit_mask!(W, H) {
+    pub fn compute_winning_cells(board: bit_mask!(W, H), mask: bit_mask!(W, H)) -> bit_mask!(W, H) {
         // Vertical
-        let mut r = (position << 1) & (position << 2) & (position << 3);
+        let mut r = (board << 1) & (board << 2) & (board << 3);
 
         // Horizontal
-        let mut p = (position << (H + 1)) & (position << 2 * (H + 1));
-        r |= p & (position << 3 * (H + 1));
-        r |= p & (position >> (H + 1));
-        p = (position >> (H + 1)) & (position >> 2 * (H + 1));
-        r |= p & (position << (H + 1));
-        r |= p & (position >> 3 * (H + 1));
+        let mut b = (board << (H + 1)) & (board << 2 * (H + 1));
+        r |= b & (board << 3 * (H + 1));
+        r |= b & (board >> (H + 1));
+        b = (board >> (H + 1)) & (board >> 2 * (H + 1));
+        r |= b & (board << (H + 1));
+        r |= b & (board >> 3 * (H + 1));
 
         // Diagonal 1
-        p = (position << H) & (position << 2 * H);
-        r |= p & (position << 3 * H);
-        r |= p & (position >> H);
-        p = (position >> H) & (position >> 2 * H);
-        r |= p & (position << H);
-        r |= p & (position >> 3 * H);
+        b = (board << H) & (board << 2 * H);
+        r |= b & (board << 3 * H);
+        r |= b & (board >> H);
+        b = (board >> H) & (board >> 2 * H);
+        r |= b & (board << H);
+        r |= b & (board >> 3 * H);
 
         // Diagonal 2
-        p = (position << (H + 2)) & (position << 2 * (H + 2));
-        r |= p & (position << 3 * (H + 2));
-        r |= p & (position >> (H + 2));
-        p = (position >> (H + 2)) & (position >> 2 * (H + 2));
-        r |= p & (position << (H + 2));
-        r |= p & (position >> 3 * (H + 2));
+        b = (board << (H + 2)) & (board << 2 * (H + 2));
+        r |= b & (board << 3 * (H + 2));
+        r |= b & (board >> (H + 2));
+        b = (board >> (H + 2)) & (board >> 2 * (H + 2));
+        r |= b & (board << (H + 2));
+        r |= b & (board >> 3 * (H + 2));
 
         r & (Self::board_mask() ^ mask)
     }
@@ -213,7 +210,7 @@ where
     }
 }
 
-impl<const W: usize, const H: usize> Default for Position<W, H>
+impl<const W: usize, const H: usize> Default for BitBoard<W, H>
 where
     Self: AsBitMask,
 {

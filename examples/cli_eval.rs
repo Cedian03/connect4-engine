@@ -2,7 +2,7 @@ use std::time::Instant;
 
 use clap::Parser;
 
-use connect4_engine::{OpeningBook, Position, Solver};
+use connect4_engine::{OpeningBook, BitBoard, Solver};
 
 #[derive(Parser)]
 struct Cli {
@@ -15,7 +15,7 @@ struct Cli {
 fn main() {
     let cli = Cli::parse();
 
-    let mut position = Position::standard();
+    let mut position = BitBoard::standard();
     if let Some(s) = cli.sequence {
         for (i, ch) in s.char_indices() {
             position.play_col(
@@ -46,7 +46,7 @@ fn main() {
     );
 }
 
-fn char_to_col(position: &Position, ch: char) -> Option<usize> {
+fn char_to_col(position: &BitBoard, ch: char) -> Option<usize> {
     (ch as usize)
         .checked_sub('A' as usize)
         .filter(|col| *col < position.width())

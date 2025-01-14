@@ -1,1519 +1,1519 @@
-use crate::position::Position;
+use crate::bit_board::BitBoard;
 
 use super::AsBitMask;
 
-impl AsBitMask for Position<1, 4> {
+impl AsBitMask for BitBoard<1, 4> {
     type BitMask = u8;
 }
 
-impl AsBitMask for Position<2, 4> {
+impl AsBitMask for BitBoard<2, 4> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<3, 4> {
+impl AsBitMask for BitBoard<3, 4> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<4, 4> {
+impl AsBitMask for BitBoard<4, 4> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<5, 4> {
+impl AsBitMask for BitBoard<5, 4> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<6, 4> {
+impl AsBitMask for BitBoard<6, 4> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<7, 4> {
+impl AsBitMask for BitBoard<7, 4> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<8, 4> {
+impl AsBitMask for BitBoard<8, 4> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<9, 4> {
+impl AsBitMask for BitBoard<9, 4> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<10, 4> {
+impl AsBitMask for BitBoard<10, 4> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<11, 4> {
+impl AsBitMask for BitBoard<11, 4> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<12, 4> {
+impl AsBitMask for BitBoard<12, 4> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<13, 4> {
+impl AsBitMask for BitBoard<13, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<14, 4> {
+impl AsBitMask for BitBoard<14, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<15, 4> {
+impl AsBitMask for BitBoard<15, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<16, 4> {
+impl AsBitMask for BitBoard<16, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<17, 4> {
+impl AsBitMask for BitBoard<17, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<18, 4> {
+impl AsBitMask for BitBoard<18, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<19, 4> {
+impl AsBitMask for BitBoard<19, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<20, 4> {
+impl AsBitMask for BitBoard<20, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<21, 4> {
+impl AsBitMask for BitBoard<21, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<22, 4> {
+impl AsBitMask for BitBoard<22, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<23, 4> {
+impl AsBitMask for BitBoard<23, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<24, 4> {
+impl AsBitMask for BitBoard<24, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<25, 4> {
+impl AsBitMask for BitBoard<25, 4> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 5> {
+impl AsBitMask for BitBoard<1, 5> {
     type BitMask = u8;
 }
 
-impl AsBitMask for Position<2, 5> {
+impl AsBitMask for BitBoard<2, 5> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<3, 5> {
+impl AsBitMask for BitBoard<3, 5> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<4, 5> {
+impl AsBitMask for BitBoard<4, 5> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<5, 5> {
+impl AsBitMask for BitBoard<5, 5> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<6, 5> {
+impl AsBitMask for BitBoard<6, 5> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<7, 5> {
+impl AsBitMask for BitBoard<7, 5> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<8, 5> {
+impl AsBitMask for BitBoard<8, 5> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<9, 5> {
+impl AsBitMask for BitBoard<9, 5> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<10, 5> {
+impl AsBitMask for BitBoard<10, 5> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<11, 5> {
+impl AsBitMask for BitBoard<11, 5> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<12, 5> {
+impl AsBitMask for BitBoard<12, 5> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<13, 5> {
+impl AsBitMask for BitBoard<13, 5> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<14, 5> {
+impl AsBitMask for BitBoard<14, 5> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<15, 5> {
+impl AsBitMask for BitBoard<15, 5> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<16, 5> {
+impl AsBitMask for BitBoard<16, 5> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<17, 5> {
+impl AsBitMask for BitBoard<17, 5> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<18, 5> {
+impl AsBitMask for BitBoard<18, 5> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<19, 5> {
+impl AsBitMask for BitBoard<19, 5> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<20, 5> {
+impl AsBitMask for BitBoard<20, 5> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<21, 5> {
+impl AsBitMask for BitBoard<21, 5> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 6> {
+impl AsBitMask for BitBoard<1, 6> {
     type BitMask = u8;
 }
 
-impl AsBitMask for Position<2, 6> {
+impl AsBitMask for BitBoard<2, 6> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<3, 6> {
+impl AsBitMask for BitBoard<3, 6> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<4, 6> {
+impl AsBitMask for BitBoard<4, 6> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<5, 6> {
+impl AsBitMask for BitBoard<5, 6> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<6, 6> {
+impl AsBitMask for BitBoard<6, 6> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<7, 6> {
+impl AsBitMask for BitBoard<7, 6> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<8, 6> {
+impl AsBitMask for BitBoard<8, 6> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<9, 6> {
+impl AsBitMask for BitBoard<9, 6> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<10, 6> {
+impl AsBitMask for BitBoard<10, 6> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<11, 6> {
+impl AsBitMask for BitBoard<11, 6> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<12, 6> {
+impl AsBitMask for BitBoard<12, 6> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<13, 6> {
+impl AsBitMask for BitBoard<13, 6> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<14, 6> {
+impl AsBitMask for BitBoard<14, 6> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<15, 6> {
+impl AsBitMask for BitBoard<15, 6> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<16, 6> {
+impl AsBitMask for BitBoard<16, 6> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<17, 6> {
+impl AsBitMask for BitBoard<17, 6> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<18, 6> {
+impl AsBitMask for BitBoard<18, 6> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 7> {
+impl AsBitMask for BitBoard<1, 7> {
     type BitMask = u8;
 }
 
-impl AsBitMask for Position<2, 7> {
+impl AsBitMask for BitBoard<2, 7> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<3, 7> {
+impl AsBitMask for BitBoard<3, 7> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<4, 7> {
+impl AsBitMask for BitBoard<4, 7> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<5, 7> {
+impl AsBitMask for BitBoard<5, 7> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<6, 7> {
+impl AsBitMask for BitBoard<6, 7> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<7, 7> {
+impl AsBitMask for BitBoard<7, 7> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<8, 7> {
+impl AsBitMask for BitBoard<8, 7> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<9, 7> {
+impl AsBitMask for BitBoard<9, 7> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<10, 7> {
+impl AsBitMask for BitBoard<10, 7> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<11, 7> {
+impl AsBitMask for BitBoard<11, 7> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<12, 7> {
+impl AsBitMask for BitBoard<12, 7> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<13, 7> {
+impl AsBitMask for BitBoard<13, 7> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<14, 7> {
+impl AsBitMask for BitBoard<14, 7> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<15, 7> {
+impl AsBitMask for BitBoard<15, 7> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<16, 7> {
+impl AsBitMask for BitBoard<16, 7> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 8> {
+impl AsBitMask for BitBoard<1, 8> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<2, 8> {
+impl AsBitMask for BitBoard<2, 8> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<3, 8> {
+impl AsBitMask for BitBoard<3, 8> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<4, 8> {
+impl AsBitMask for BitBoard<4, 8> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<5, 8> {
+impl AsBitMask for BitBoard<5, 8> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<6, 8> {
+impl AsBitMask for BitBoard<6, 8> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<7, 8> {
+impl AsBitMask for BitBoard<7, 8> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<8, 8> {
+impl AsBitMask for BitBoard<8, 8> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<9, 8> {
+impl AsBitMask for BitBoard<9, 8> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<10, 8> {
+impl AsBitMask for BitBoard<10, 8> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<11, 8> {
+impl AsBitMask for BitBoard<11, 8> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<12, 8> {
+impl AsBitMask for BitBoard<12, 8> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<13, 8> {
+impl AsBitMask for BitBoard<13, 8> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<14, 8> {
+impl AsBitMask for BitBoard<14, 8> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 9> {
+impl AsBitMask for BitBoard<1, 9> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<2, 9> {
+impl AsBitMask for BitBoard<2, 9> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<3, 9> {
+impl AsBitMask for BitBoard<3, 9> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<4, 9> {
+impl AsBitMask for BitBoard<4, 9> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<5, 9> {
+impl AsBitMask for BitBoard<5, 9> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<6, 9> {
+impl AsBitMask for BitBoard<6, 9> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<7, 9> {
+impl AsBitMask for BitBoard<7, 9> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<8, 9> {
+impl AsBitMask for BitBoard<8, 9> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<9, 9> {
+impl AsBitMask for BitBoard<9, 9> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<10, 9> {
+impl AsBitMask for BitBoard<10, 9> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<11, 9> {
+impl AsBitMask for BitBoard<11, 9> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<12, 9> {
+impl AsBitMask for BitBoard<12, 9> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 10> {
+impl AsBitMask for BitBoard<1, 10> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<2, 10> {
+impl AsBitMask for BitBoard<2, 10> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<3, 10> {
+impl AsBitMask for BitBoard<3, 10> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<4, 10> {
+impl AsBitMask for BitBoard<4, 10> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<5, 10> {
+impl AsBitMask for BitBoard<5, 10> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<6, 10> {
+impl AsBitMask for BitBoard<6, 10> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<7, 10> {
+impl AsBitMask for BitBoard<7, 10> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<8, 10> {
+impl AsBitMask for BitBoard<8, 10> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<9, 10> {
+impl AsBitMask for BitBoard<9, 10> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<10, 10> {
+impl AsBitMask for BitBoard<10, 10> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<11, 10> {
+impl AsBitMask for BitBoard<11, 10> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 11> {
+impl AsBitMask for BitBoard<1, 11> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<2, 11> {
+impl AsBitMask for BitBoard<2, 11> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<3, 11> {
+impl AsBitMask for BitBoard<3, 11> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<4, 11> {
+impl AsBitMask for BitBoard<4, 11> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<5, 11> {
+impl AsBitMask for BitBoard<5, 11> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<6, 11> {
+impl AsBitMask for BitBoard<6, 11> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<7, 11> {
+impl AsBitMask for BitBoard<7, 11> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<8, 11> {
+impl AsBitMask for BitBoard<8, 11> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<9, 11> {
+impl AsBitMask for BitBoard<9, 11> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<10, 11> {
+impl AsBitMask for BitBoard<10, 11> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 12> {
+impl AsBitMask for BitBoard<1, 12> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<2, 12> {
+impl AsBitMask for BitBoard<2, 12> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<3, 12> {
+impl AsBitMask for BitBoard<3, 12> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<4, 12> {
+impl AsBitMask for BitBoard<4, 12> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<5, 12> {
+impl AsBitMask for BitBoard<5, 12> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<6, 12> {
+impl AsBitMask for BitBoard<6, 12> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<7, 12> {
+impl AsBitMask for BitBoard<7, 12> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<8, 12> {
+impl AsBitMask for BitBoard<8, 12> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<9, 12> {
+impl AsBitMask for BitBoard<9, 12> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 13> {
+impl AsBitMask for BitBoard<1, 13> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<2, 13> {
+impl AsBitMask for BitBoard<2, 13> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<3, 13> {
+impl AsBitMask for BitBoard<3, 13> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<4, 13> {
+impl AsBitMask for BitBoard<4, 13> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<5, 13> {
+impl AsBitMask for BitBoard<5, 13> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<6, 13> {
+impl AsBitMask for BitBoard<6, 13> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<7, 13> {
+impl AsBitMask for BitBoard<7, 13> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<8, 13> {
+impl AsBitMask for BitBoard<8, 13> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<9, 13> {
+impl AsBitMask for BitBoard<9, 13> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 14> {
+impl AsBitMask for BitBoard<1, 14> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<2, 14> {
+impl AsBitMask for BitBoard<2, 14> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<3, 14> {
+impl AsBitMask for BitBoard<3, 14> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<4, 14> {
+impl AsBitMask for BitBoard<4, 14> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<5, 14> {
+impl AsBitMask for BitBoard<5, 14> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<6, 14> {
+impl AsBitMask for BitBoard<6, 14> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<7, 14> {
+impl AsBitMask for BitBoard<7, 14> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<8, 14> {
+impl AsBitMask for BitBoard<8, 14> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 15> {
+impl AsBitMask for BitBoard<1, 15> {
     type BitMask = u16;
 }
 
-impl AsBitMask for Position<2, 15> {
+impl AsBitMask for BitBoard<2, 15> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<3, 15> {
+impl AsBitMask for BitBoard<3, 15> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<4, 15> {
+impl AsBitMask for BitBoard<4, 15> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<5, 15> {
+impl AsBitMask for BitBoard<5, 15> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<6, 15> {
+impl AsBitMask for BitBoard<6, 15> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<7, 15> {
+impl AsBitMask for BitBoard<7, 15> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<8, 15> {
+impl AsBitMask for BitBoard<8, 15> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 16> {
+impl AsBitMask for BitBoard<1, 16> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 16> {
+impl AsBitMask for BitBoard<2, 16> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 16> {
+impl AsBitMask for BitBoard<3, 16> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<4, 16> {
+impl AsBitMask for BitBoard<4, 16> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<5, 16> {
+impl AsBitMask for BitBoard<5, 16> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<6, 16> {
+impl AsBitMask for BitBoard<6, 16> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<7, 16> {
+impl AsBitMask for BitBoard<7, 16> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 17> {
+impl AsBitMask for BitBoard<1, 17> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 17> {
+impl AsBitMask for BitBoard<2, 17> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 17> {
+impl AsBitMask for BitBoard<3, 17> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<4, 17> {
+impl AsBitMask for BitBoard<4, 17> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<5, 17> {
+impl AsBitMask for BitBoard<5, 17> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<6, 17> {
+impl AsBitMask for BitBoard<6, 17> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<7, 17> {
+impl AsBitMask for BitBoard<7, 17> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 18> {
+impl AsBitMask for BitBoard<1, 18> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 18> {
+impl AsBitMask for BitBoard<2, 18> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 18> {
+impl AsBitMask for BitBoard<3, 18> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<4, 18> {
+impl AsBitMask for BitBoard<4, 18> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<5, 18> {
+impl AsBitMask for BitBoard<5, 18> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<6, 18> {
+impl AsBitMask for BitBoard<6, 18> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 19> {
+impl AsBitMask for BitBoard<1, 19> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 19> {
+impl AsBitMask for BitBoard<2, 19> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 19> {
+impl AsBitMask for BitBoard<3, 19> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<4, 19> {
+impl AsBitMask for BitBoard<4, 19> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<5, 19> {
+impl AsBitMask for BitBoard<5, 19> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<6, 19> {
+impl AsBitMask for BitBoard<6, 19> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 20> {
+impl AsBitMask for BitBoard<1, 20> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 20> {
+impl AsBitMask for BitBoard<2, 20> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 20> {
+impl AsBitMask for BitBoard<3, 20> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<4, 20> {
+impl AsBitMask for BitBoard<4, 20> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<5, 20> {
+impl AsBitMask for BitBoard<5, 20> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<6, 20> {
+impl AsBitMask for BitBoard<6, 20> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 21> {
+impl AsBitMask for BitBoard<1, 21> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 21> {
+impl AsBitMask for BitBoard<2, 21> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 21> {
+impl AsBitMask for BitBoard<3, 21> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<4, 21> {
+impl AsBitMask for BitBoard<4, 21> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<5, 21> {
+impl AsBitMask for BitBoard<5, 21> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 22> {
+impl AsBitMask for BitBoard<1, 22> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 22> {
+impl AsBitMask for BitBoard<2, 22> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 22> {
+impl AsBitMask for BitBoard<3, 22> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<4, 22> {
+impl AsBitMask for BitBoard<4, 22> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<5, 22> {
+impl AsBitMask for BitBoard<5, 22> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 23> {
+impl AsBitMask for BitBoard<1, 23> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 23> {
+impl AsBitMask for BitBoard<2, 23> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 23> {
+impl AsBitMask for BitBoard<3, 23> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<4, 23> {
+impl AsBitMask for BitBoard<4, 23> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<5, 23> {
+impl AsBitMask for BitBoard<5, 23> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 24> {
+impl AsBitMask for BitBoard<1, 24> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 24> {
+impl AsBitMask for BitBoard<2, 24> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 24> {
+impl AsBitMask for BitBoard<3, 24> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<4, 24> {
+impl AsBitMask for BitBoard<4, 24> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<5, 24> {
+impl AsBitMask for BitBoard<5, 24> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 25> {
+impl AsBitMask for BitBoard<1, 25> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 25> {
+impl AsBitMask for BitBoard<2, 25> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 25> {
+impl AsBitMask for BitBoard<3, 25> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<4, 25> {
+impl AsBitMask for BitBoard<4, 25> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 26> {
+impl AsBitMask for BitBoard<1, 26> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 26> {
+impl AsBitMask for BitBoard<2, 26> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 26> {
+impl AsBitMask for BitBoard<3, 26> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<4, 26> {
+impl AsBitMask for BitBoard<4, 26> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 27> {
+impl AsBitMask for BitBoard<1, 27> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 27> {
+impl AsBitMask for BitBoard<2, 27> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 27> {
+impl AsBitMask for BitBoard<3, 27> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<4, 27> {
+impl AsBitMask for BitBoard<4, 27> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 28> {
+impl AsBitMask for BitBoard<1, 28> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 28> {
+impl AsBitMask for BitBoard<2, 28> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 28> {
+impl AsBitMask for BitBoard<3, 28> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<4, 28> {
+impl AsBitMask for BitBoard<4, 28> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 29> {
+impl AsBitMask for BitBoard<1, 29> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 29> {
+impl AsBitMask for BitBoard<2, 29> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 29> {
+impl AsBitMask for BitBoard<3, 29> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<4, 29> {
+impl AsBitMask for BitBoard<4, 29> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 30> {
+impl AsBitMask for BitBoard<1, 30> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 30> {
+impl AsBitMask for BitBoard<2, 30> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 30> {
+impl AsBitMask for BitBoard<3, 30> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<4, 30> {
+impl AsBitMask for BitBoard<4, 30> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 31> {
+impl AsBitMask for BitBoard<1, 31> {
     type BitMask = u32;
 }
 
-impl AsBitMask for Position<2, 31> {
+impl AsBitMask for BitBoard<2, 31> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<3, 31> {
+impl AsBitMask for BitBoard<3, 31> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<4, 31> {
+impl AsBitMask for BitBoard<4, 31> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 32> {
+impl AsBitMask for BitBoard<1, 32> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 32> {
+impl AsBitMask for BitBoard<2, 32> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<3, 32> {
+impl AsBitMask for BitBoard<3, 32> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 33> {
+impl AsBitMask for BitBoard<1, 33> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 33> {
+impl AsBitMask for BitBoard<2, 33> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<3, 33> {
+impl AsBitMask for BitBoard<3, 33> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 34> {
+impl AsBitMask for BitBoard<1, 34> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 34> {
+impl AsBitMask for BitBoard<2, 34> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<3, 34> {
+impl AsBitMask for BitBoard<3, 34> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 35> {
+impl AsBitMask for BitBoard<1, 35> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 35> {
+impl AsBitMask for BitBoard<2, 35> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<3, 35> {
+impl AsBitMask for BitBoard<3, 35> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 36> {
+impl AsBitMask for BitBoard<1, 36> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 36> {
+impl AsBitMask for BitBoard<2, 36> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<3, 36> {
+impl AsBitMask for BitBoard<3, 36> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 37> {
+impl AsBitMask for BitBoard<1, 37> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 37> {
+impl AsBitMask for BitBoard<2, 37> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<3, 37> {
+impl AsBitMask for BitBoard<3, 37> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 38> {
+impl AsBitMask for BitBoard<1, 38> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 38> {
+impl AsBitMask for BitBoard<2, 38> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<3, 38> {
+impl AsBitMask for BitBoard<3, 38> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 39> {
+impl AsBitMask for BitBoard<1, 39> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 39> {
+impl AsBitMask for BitBoard<2, 39> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<3, 39> {
+impl AsBitMask for BitBoard<3, 39> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 40> {
+impl AsBitMask for BitBoard<1, 40> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 40> {
+impl AsBitMask for BitBoard<2, 40> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<3, 40> {
+impl AsBitMask for BitBoard<3, 40> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 41> {
+impl AsBitMask for BitBoard<1, 41> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 41> {
+impl AsBitMask for BitBoard<2, 41> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<3, 41> {
+impl AsBitMask for BitBoard<3, 41> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 42> {
+impl AsBitMask for BitBoard<1, 42> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 42> {
+impl AsBitMask for BitBoard<2, 42> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 43> {
+impl AsBitMask for BitBoard<1, 43> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 43> {
+impl AsBitMask for BitBoard<2, 43> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 44> {
+impl AsBitMask for BitBoard<1, 44> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 44> {
+impl AsBitMask for BitBoard<2, 44> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 45> {
+impl AsBitMask for BitBoard<1, 45> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 45> {
+impl AsBitMask for BitBoard<2, 45> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 46> {
+impl AsBitMask for BitBoard<1, 46> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 46> {
+impl AsBitMask for BitBoard<2, 46> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 47> {
+impl AsBitMask for BitBoard<1, 47> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 47> {
+impl AsBitMask for BitBoard<2, 47> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 48> {
+impl AsBitMask for BitBoard<1, 48> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 48> {
+impl AsBitMask for BitBoard<2, 48> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 49> {
+impl AsBitMask for BitBoard<1, 49> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 49> {
+impl AsBitMask for BitBoard<2, 49> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 50> {
+impl AsBitMask for BitBoard<1, 50> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 50> {
+impl AsBitMask for BitBoard<2, 50> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 51> {
+impl AsBitMask for BitBoard<1, 51> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 51> {
+impl AsBitMask for BitBoard<2, 51> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 52> {
+impl AsBitMask for BitBoard<1, 52> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 52> {
+impl AsBitMask for BitBoard<2, 52> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 53> {
+impl AsBitMask for BitBoard<1, 53> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 53> {
+impl AsBitMask for BitBoard<2, 53> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 54> {
+impl AsBitMask for BitBoard<1, 54> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 54> {
+impl AsBitMask for BitBoard<2, 54> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 55> {
+impl AsBitMask for BitBoard<1, 55> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 55> {
+impl AsBitMask for BitBoard<2, 55> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 56> {
+impl AsBitMask for BitBoard<1, 56> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 56> {
+impl AsBitMask for BitBoard<2, 56> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 57> {
+impl AsBitMask for BitBoard<1, 57> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 57> {
+impl AsBitMask for BitBoard<2, 57> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 58> {
+impl AsBitMask for BitBoard<1, 58> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 58> {
+impl AsBitMask for BitBoard<2, 58> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 59> {
+impl AsBitMask for BitBoard<1, 59> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 59> {
+impl AsBitMask for BitBoard<2, 59> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 60> {
+impl AsBitMask for BitBoard<1, 60> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 60> {
+impl AsBitMask for BitBoard<2, 60> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 61> {
+impl AsBitMask for BitBoard<1, 61> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 61> {
+impl AsBitMask for BitBoard<2, 61> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 62> {
+impl AsBitMask for BitBoard<1, 62> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 62> {
+impl AsBitMask for BitBoard<2, 62> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 63> {
+impl AsBitMask for BitBoard<1, 63> {
     type BitMask = u64;
 }
 
-impl AsBitMask for Position<2, 63> {
+impl AsBitMask for BitBoard<2, 63> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 64> {
+impl AsBitMask for BitBoard<1, 64> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 65> {
+impl AsBitMask for BitBoard<1, 65> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 66> {
+impl AsBitMask for BitBoard<1, 66> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 67> {
+impl AsBitMask for BitBoard<1, 67> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 68> {
+impl AsBitMask for BitBoard<1, 68> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 69> {
+impl AsBitMask for BitBoard<1, 69> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 70> {
+impl AsBitMask for BitBoard<1, 70> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 71> {
+impl AsBitMask for BitBoard<1, 71> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 72> {
+impl AsBitMask for BitBoard<1, 72> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 73> {
+impl AsBitMask for BitBoard<1, 73> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 74> {
+impl AsBitMask for BitBoard<1, 74> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 75> {
+impl AsBitMask for BitBoard<1, 75> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 76> {
+impl AsBitMask for BitBoard<1, 76> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 77> {
+impl AsBitMask for BitBoard<1, 77> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 78> {
+impl AsBitMask for BitBoard<1, 78> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 79> {
+impl AsBitMask for BitBoard<1, 79> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 80> {
+impl AsBitMask for BitBoard<1, 80> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 81> {
+impl AsBitMask for BitBoard<1, 81> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 82> {
+impl AsBitMask for BitBoard<1, 82> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 83> {
+impl AsBitMask for BitBoard<1, 83> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 84> {
+impl AsBitMask for BitBoard<1, 84> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 85> {
+impl AsBitMask for BitBoard<1, 85> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 86> {
+impl AsBitMask for BitBoard<1, 86> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 87> {
+impl AsBitMask for BitBoard<1, 87> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 88> {
+impl AsBitMask for BitBoard<1, 88> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 89> {
+impl AsBitMask for BitBoard<1, 89> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 90> {
+impl AsBitMask for BitBoard<1, 90> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 91> {
+impl AsBitMask for BitBoard<1, 91> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 92> {
+impl AsBitMask for BitBoard<1, 92> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 93> {
+impl AsBitMask for BitBoard<1, 93> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 94> {
+impl AsBitMask for BitBoard<1, 94> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 95> {
+impl AsBitMask for BitBoard<1, 95> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 96> {
+impl AsBitMask for BitBoard<1, 96> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 97> {
+impl AsBitMask for BitBoard<1, 97> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 98> {
+impl AsBitMask for BitBoard<1, 98> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 99> {
+impl AsBitMask for BitBoard<1, 99> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 100> {
+impl AsBitMask for BitBoard<1, 100> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 101> {
+impl AsBitMask for BitBoard<1, 101> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 102> {
+impl AsBitMask for BitBoard<1, 102> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 103> {
+impl AsBitMask for BitBoard<1, 103> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 104> {
+impl AsBitMask for BitBoard<1, 104> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 105> {
+impl AsBitMask for BitBoard<1, 105> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 106> {
+impl AsBitMask for BitBoard<1, 106> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 107> {
+impl AsBitMask for BitBoard<1, 107> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 108> {
+impl AsBitMask for BitBoard<1, 108> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 109> {
+impl AsBitMask for BitBoard<1, 109> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 110> {
+impl AsBitMask for BitBoard<1, 110> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 111> {
+impl AsBitMask for BitBoard<1, 111> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 112> {
+impl AsBitMask for BitBoard<1, 112> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 113> {
+impl AsBitMask for BitBoard<1, 113> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 114> {
+impl AsBitMask for BitBoard<1, 114> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 115> {
+impl AsBitMask for BitBoard<1, 115> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 116> {
+impl AsBitMask for BitBoard<1, 116> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 117> {
+impl AsBitMask for BitBoard<1, 117> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 118> {
+impl AsBitMask for BitBoard<1, 118> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 119> {
+impl AsBitMask for BitBoard<1, 119> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 120> {
+impl AsBitMask for BitBoard<1, 120> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 121> {
+impl AsBitMask for BitBoard<1, 121> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 122> {
+impl AsBitMask for BitBoard<1, 122> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 123> {
+impl AsBitMask for BitBoard<1, 123> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 124> {
+impl AsBitMask for BitBoard<1, 124> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 125> {
+impl AsBitMask for BitBoard<1, 125> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 126> {
+impl AsBitMask for BitBoard<1, 126> {
     type BitMask = u128;
 }
 
-impl AsBitMask for Position<1, 127> {
+impl AsBitMask for BitBoard<1, 127> {
     type BitMask = u128;
 }
