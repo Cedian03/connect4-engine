@@ -2,18 +2,12 @@ use std::ops;
 
 use num_traits::{AsPrimitive, NumAssign, PrimInt};
 
-#[macro_export]
-macro_rules! bit_mask {
-    ($w:ident, $h:ident) => {
-        <$crate::board::BitBoard<$w, $h> as $crate::magic::AsBitMask>::BitMask
-    };
-}
+use crate::board::Board;
 
-pub trait AsBitMask
-where
-    Self::BitMask: BitMaskOps,
-{
-    type BitMask;
+pub type BitMask<const W: usize, const H: usize> = <Board<W, H> as AsBitBoard>::BitMask;
+
+pub trait AsBitBoard {
+    type BitMask: BitMaskOps;
 }
 
 pub trait BitMaskOps:

@@ -1,9 +1,9 @@
-use crate::{bit_mask, board::BitBoard, magic::*};
+use crate::{board::Board, magic::*};
 
 #[derive(Clone)]
 pub struct MoveSorter<const W: usize, const H: usize>
 where
-    BitBoard<W, H>: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
     len: usize,
     entries: [Entry<W, H>; W],
@@ -11,7 +11,7 @@ where
 
 impl<const W: usize, const H: usize> Default for MoveSorter<W, H>
 where
-    BitBoard<W, H>: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
     fn default() -> Self {
         Self {
@@ -24,15 +24,15 @@ where
 #[derive(Copy, Clone)]
 struct Entry<const W: usize, const H: usize>
 where
-    BitBoard<W, H>: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
-    mask: bit_mask!(W, H),
+    mask: BitMask<W, H>,
     score: u32,
 }
 
 impl<const W: usize, const H: usize> Default for Entry<W, H>
 where
-    BitBoard<W, H>: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
     fn default() -> Self {
         Self {
@@ -44,9 +44,9 @@ where
 
 impl<const W: usize, const H: usize> MoveSorter<W, H>
 where
-    BitBoard<W, H>: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
-    pub fn add(&mut self, mask: bit_mask!(W, H), score: u32) {
+    pub fn add(&mut self, mask: BitMask<W, H>, score: u32) {
         let mut pos = self.len;
         while pos != 0 && self.entries[pos - 1].score > score {
             self.entries.swap(pos, pos - 1);
@@ -59,9 +59,9 @@ where
 
 impl<const W: usize, const H: usize> Iterator for MoveSorter<W, H>
 where
-    BitBoard<W, H>: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
-    type Item = bit_mask!(W, H);
+    type Item = BitMask<W, H>;
 
     fn next(&mut self) -> Option<Self::Item> {
         (self.len > 0).then(|| {

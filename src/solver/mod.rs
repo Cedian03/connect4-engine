@@ -9,10 +9,13 @@ pub use opening_book::OpeningBook;
 
 use num_traits::{PrimInt, Zero};
 
-use crate::{bit_mask, board::BitBoard, magic::*};
+use crate::{
+    board::{BitBoard, Board},
+    magic::*,
+};
 
 #[derive(Debug)]
-pub struct Solver<const W: usize, const H: usize> {
+pub struct Solver<const W: usize = 7, const H: usize = 6> {
     table: TranspositionTable<W, H>,
     book: Option<OpeningBook<W, H>>,
     searched: u64,
@@ -64,15 +67,15 @@ impl<const W: usize, const H: usize> Solver<W, H> {
 
 impl<const W: usize, const H: usize> Solver<W, H>
 where
-    BitBoard<W, H>: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
-    pub fn analyze(&mut self, position: &BitBoard<W, H>) -> [Option<i32>; W] {
+    pub fn analyze(&mut self, board: &Board<W, H>) -> [Option<i32>; W] {
         let mut evals = [None; W];
         for col in 0..W {
-            if position.can_play_col(col) {
-                let mut new_position = position.clone();
-                new_position.play_col(col);
-                let eval = -self.evaluate(&new_position);
+            if board.can_play_col(col) {
+                let mut new_board = board.clone();
+                new_board.play_col(col);
+                let eval = -self.evaluate(&new_board);
                 evals[col] = Some(eval);
             }
         }
@@ -80,14 +83,26 @@ where
         evals
     }
 
-    pub fn evaluate(&mut self, position: &BitBoard<W, H>) -> i32 {
-        if position.can_win_next() {
-            return (Self::MAX_DEPTH + 1 - position.half_turn()) / 2;
+    pub fn evaluate(&mut self, board: &Board<W, H>) -> i32 {
+        if board.can_win_next() {
+            return (Self::MAX_DEPTH + 1 - board.half_turn()) / 2;
         }
 
-        let mut min = -(Self::MAX_DEPTH - position.half_turn()) / 2;
-        let mut max = (Self::MAX_DEPTH + 1 - position.half_turn()) / 2;
+        let min = -(Self::MAX_DEPTH - board.half_turn()) / 2;
+        let max = (Self::MAX_DEPTH + 1 - board.half_turn()) / 2;
 
+        self.fun_name(board, min, max)
+    }
+
+    pub fn weak(&mut self, board: &Board<W, H>) -> i32 {
+        if board.can_win_next() {
+            return 1;
+        }
+
+        self.fun_name(board, -1, 1)
+    }
+
+    fn fun_name(&mut self, board: &Board<W, H>, mut min: i32, mut max: i32) -> i32 {
         while min < max {
             let mut med = min + (max - min) / 2;
             if med <= 0 && min / 2 < med {
@@ -96,7 +111,7 @@ where
                 med = max / 2
             }
 
-            let r = self.negamax(position, med, med + 1);
+            let r = self.negamax(board, med, med + 1);
 
             if r <= med {
                 max = r
@@ -108,22 +123,22 @@ where
         min
     }
 
-    fn negamax(&mut self, position: &BitBoard<W, H>, mut alpha: i32, mut beta: i32) -> i32 {
+    fn negamax(&mut self, board: &Board<W, H>, mut alpha: i32, mut beta: i32) -> i32 {
         assert!(alpha < beta);
-        assert!(!position.can_win_next());
+        assert!(!board.can_win_next());
 
         self.searched += 1;
 
-        let possible = position.possible_non_losing_moves();
+        let possible = board.possible_non_losing_moves();
         if possible.is_zero() {
-            return -(Self::MAX_DEPTH - position.half_turn()) / 2;
+            return -(Self::MAX_DEPTH - board.half_turn()) / 2;
         }
 
-        if position.half_turn() >= Self::MAX_DEPTH - 2 {
+        if board.half_turn() >= Self::MAX_DEPTH - 2 {
             return 0;
         }
 
-        let mut min = -(Self::MAX_DEPTH - 2 - position.half_turn()) / 2;
+        let mut min = -(Self::MAX_DEPTH - 2 - board.half_turn()) / 2;
         if alpha < min {
             alpha = min;
             if alpha >= beta {
@@ -131,7 +146,7 @@ where
             }
         }
 
-        let mut max = (Self::MAX_DEPTH - 1 - position.half_turn()) / 2;
+        let mut max = (Self::MAX_DEPTH - 1 - board.half_turn()) / 2;
         if beta > max {
             beta = max;
             if alpha >= beta {
@@ -140,15 +155,15 @@ where
         }
 
         if let Some(book) = &self.book {
-            if let Some(val) = book.get(&position) {
-                return val as i32 + Self::MIN_SCORE - 1;
+            if let Some(val) = book.get(&board) {
+                return val + Self::MIN_SCORE - 1;
             }
         }
 
-        let key = position.key();
+        let key = board.key();
         if let Some(val) = self.table.get(key) {
-            if val as i32 > Self::MAX_SCORE - Self::MIN_SCORE + 1 {
-                min = val as i32 + 2 * Self::MIN_SCORE - Self::MAX_SCORE - 2;
+            if val > Self::MAX_SCORE - Self::MIN_SCORE + 1 {
+                min = val + 2 * Self::MIN_SCORE - Self::MAX_SCORE - 2;
                 if alpha < min {
                     alpha = min;
                     if alpha >= beta {
@@ -156,7 +171,7 @@ where
                     }
                 }
             } else {
-                max = val as i32 + Self::MIN_SCORE - 1;
+                max = val + Self::MIN_SCORE - 1;
                 if beta > max {
                     beta = max;
                     if alpha >= beta {
@@ -169,15 +184,15 @@ where
         let mut moves = MoveSorter::default();
         for i in (0..W).rev() {
             let mask = possible & BitBoard::col_mask(Self::COLUMN_ORDER[i]);
-            if !(mask.is_zero()) {
-                moves.add(mask, Self::score(position, mask));
+            if mask != 0.into() {
+                moves.add(mask, Self::score(board, mask));
             }
         }
 
         for next in moves {
-            let mut position2 = position.clone();
-            position2.play_mask(next);
-            let score = -self.negamax(&position2, -beta, -alpha);
+            let mut new_board = board.clone();
+            new_board.play_mask(next);
+            let score = -self.negamax(&new_board, -beta, -alpha);
 
             if score >= beta {
                 self.table.put(
@@ -196,7 +211,22 @@ where
         alpha
     }
 
-    fn score(position: &BitBoard<W, H>, mask: bit_mask!(W, H)) -> u32 {
+    pub fn __foo(&self, board: Board<W, H>) -> String {
+        // self.table
+        //     .get(board.key())
+        //     .or_else(|| self.book.as_ref().and_then(|b| b.get(&board)))
+        //     .is_some()
+
+        if self.table.get(board.key()).is_some() {
+            "In table".to_owned()
+        } else if self.book.as_ref().and_then(|b| b.get(&board)).is_some() {
+            "In book".to_owned()
+        } else {
+            "Not cached".to_owned()
+        }
+    }
+
+    fn score(position: &BitBoard<W, H>, mask: BitMask<W, H>) -> u32 {
         BitBoard::<W, H>::compute_winning_cells(position.curr | mask, position.mask).count_ones()
     }
 }

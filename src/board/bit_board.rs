@@ -1,14 +1,14 @@
 use num_traits::{PrimInt, Zero};
 
-use crate::{bit_mask, magic::*};
+use crate::{board::Board, magic::*};
 
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct BitBoard<const W: usize = 7, const H: usize = 6>
 where
-    Self: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
-    pub(crate) curr: bit_mask!(W, H),
-    pub(crate) mask: bit_mask!(W, H),
+    pub(crate) curr: BitMask<W, H>,
+    pub(crate) mask: BitMask<W, H>,
 }
 
 impl BitBoard {
@@ -19,10 +19,10 @@ impl BitBoard {
 
 impl<const W: usize, const H: usize> BitBoard<W, H>
 where
-    Self: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
-    // pub const BOTTOM_MASK: bit_mask!(W, H) = Self::bottom_mask(); // TODO
-    // pub const BOARD_MASK: bit_mask!(W, H) = Self::board_mask(); // TODO
+    // pub const BOTTOM_MASK: BitMask<W, H> = Self::bottom_mask(); // TODO
+    // pub const BOARD_MASK: BitMask<W, H> = Self::board_mask(); // TODO
 
     pub fn new() -> Self {
         Self::default()
@@ -36,11 +36,11 @@ where
         H
     }
 
-    pub const fn curr(&self) -> bit_mask!(W, H) {
+    pub const fn curr(&self) -> BitMask<W, H> {
         self.curr
     }
 
-    pub const fn mask(&self) -> bit_mask!(W, H) {
+    pub const fn mask(&self) -> BitMask<W, H> {
         self.mask
     }
 
@@ -48,7 +48,7 @@ where
         self.play_mask(self.possible_mask_col(col))
     }
 
-    pub fn play_mask(&mut self, mask: bit_mask!(W, H)) {
+    pub fn play_mask(&mut self, mask: BitMask<W, H>) {
         self.curr ^= self.mask;
         self.mask |= mask;
     }
@@ -61,7 +61,7 @@ where
         self.mask.count_ones() as i32
     }
 
-    pub fn possible_non_losing_moves(&self) -> bit_mask!(W, H) {
+    pub fn possible_non_losing_moves(&self) -> BitMask<W, H> {
         let mut possible_mask = self.possible_mask();
         let opponent_win = self.opponent_winning_cells();
         let forced_moves = possible_mask & opponent_win;
@@ -85,11 +85,11 @@ where
         (self.possible_mask_col(col).trailing_zeros() % (H as u32 + 1)) as usize
     }
 
-    pub fn possible_mask_col(&self, col: usize) -> bit_mask!(W, H) {
+    pub fn possible_mask_col(&self, col: usize) -> BitMask<W, H> {
         self.possible_mask() & BitBoard::col_mask(col)
     }
 
-    pub fn possible_mask(&self) -> bit_mask!(W, H) {
+    pub fn possible_mask(&self) -> BitMask<W, H> {
         (self.mask + Self::bottom_mask()) & Self::board_mask()
     }
 
@@ -101,15 +101,15 @@ where
         !((self.winning_cells() & self.possible_mask() & BitBoard::col_mask(col)).is_zero())
     }
 
-    pub fn winning_cells(&self) -> bit_mask!(W, H) {
+    pub fn winning_cells(&self) -> BitMask<W, H> {
         BitBoard::compute_winning_cells(self.curr, self.mask)
     }
 
-    pub fn opponent_winning_cells(&self) -> bit_mask!(W, H) {
+    pub fn opponent_winning_cells(&self) -> BitMask<W, H> {
         BitBoard::compute_winning_cells(self.curr ^ self.mask, self.mask)
     }
 
-    pub fn compute_winning_cells(board: bit_mask!(W, H), mask: bit_mask!(W, H)) -> bit_mask!(W, H) {
+    pub fn compute_winning_cells(board: BitMask<W, H>, mask: BitMask<W, H>) -> BitMask<W, H> {
         // Vertical
         let mut r = (board << 1) & (board << 2) & (board << 3);
 
@@ -140,11 +140,11 @@ where
         r & (Self::board_mask() ^ mask)
     }
 
-    pub fn key(&self) -> bit_mask!(W, H) {
+    pub fn key(&self) -> BitMask<W, H> {
         self.curr + self.mask + Self::board_mask()
     }
 
-    pub fn key_3(&self) -> bit_mask!(W, H) {
+    pub fn key_3(&self) -> BitMask<W, H> {
         let mut key_forward = 0.into();
         for col in 0..W {
             self.partial_key_3(&mut key_forward, col);
@@ -162,39 +162,42 @@ where
         }
     }
 
-    fn partial_key_3(&self, key: &mut bit_mask!(W, H), col: usize) {
-        let mut pos = <bit_mask!(W, H)>::from(1) << (col * (H + 1));
+    fn partial_key_3(&self, key: &mut BitMask<W, H>, col: usize) {
+        let mut board = Self::col_top_mask(col);
 
-        while !((pos & self.mask).is_zero()) {
+        while (board & self.mask) != 0.into() {
             *key *= 3.into();
-            if !((pos & self.curr).is_zero()) {
-                *key += 1.into()
+
+            if (board & self.curr) != 0.into() {
+                *key += 1.into();
             } else {
-                *key += 2.into()
+                *key += 2.into();
             }
-            pos <<= 1;
+
+            board <<= 1;
         }
+
         *key *= 3.into();
     }
 
-    pub fn col_top_mask(col: usize) -> bit_mask!(W, H) {
-        <bit_mask!(W, H)>::from(1) << (col * (H + 1) + (H - 1))
+    pub fn col_top_mask(col: usize) -> BitMask<W, H> {
+        <BitMask<W, H>>::from(1) << (col * (H + 1) + (H - 1))
     }
 
-    pub fn cell_mask(col: usize, row: usize) -> bit_mask!(W, H) {
-        <bit_mask!(W, H)>::from(1) << (col * (H + 1) + row)
+    pub fn cell_mask(col: usize, row: usize) -> BitMask<W, H> {
+        <BitMask<W, H>>::from(1) << (col * (H + 1) + row)
     }
 
-    pub fn col_bot_mask(col: usize) -> bit_mask!(W, H) {
-        <bit_mask!(W, H)>::from(1) << col * (H + 1)
+    pub fn col_bot_mask(col: usize) -> BitMask<W, H> {
+        <BitMask<W, H>>::from(1) << col * (H + 1)
     }
 
-    pub fn col_mask(col: usize) -> bit_mask!(W, H) {
-        ((<bit_mask!(W, H)>::from(1) << H) - 1.into()) << col * (H + 1)
+    pub fn col_mask(col: usize) -> BitMask<W, H> {
+        ((<BitMask<W, H>>::from(1) << H) - 1.into()) << col * (H + 1)
     }
 
     // TODO: constify
-    fn bottom_mask() -> bit_mask!(W, H) {
+    fn bottom_mask() -> BitMask<W, H> {
         let mut mask = 0.into();
 
         let mut i = 0;
@@ -209,14 +212,14 @@ where
     }
 
     // TODO: constify
-    fn board_mask() -> bit_mask!(W, H) {
-        Self::bottom_mask() * ((<bit_mask!(W, H)>::from(1) << H) - 1.into())
+    fn board_mask() -> BitMask<W, H> {
+        Self::bottom_mask() * ((<BitMask<W, H>>::from(1) << H) - 1.into())
     }
 }
 
 impl<const W: usize, const H: usize> Default for BitBoard<W, H>
 where
-    Self: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
     fn default() -> Self {
         Self {

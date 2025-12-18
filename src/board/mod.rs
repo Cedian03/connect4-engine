@@ -6,21 +6,21 @@ use std::{fmt, ops};
 
 use crate::magic::*;
 
-#[derive(Default)]
-pub struct Board<const W: usize, const H: usize>(BitBoard<W, H>)
+#[derive(Clone, Copy, Default)]
+pub struct Board<const W: usize = 7, const H: usize = 6>(BitBoard<W, H>)
 where
-    BitBoard<W, H>: AsBitMask;
+    Self: AsBitBoard;
 
 impl<const W: usize, const H: usize> Board<W, H>
 where
-    BitBoard<W, H>: AsBitMask,
+    Self: AsBitBoard,
 {
     pub fn new() -> Self {
         Self(BitBoard::new())
     }
 
     pub fn play(&mut self, col: Col<W>) -> Result<Cell<W, H>, ()> {
-        self.can_play_col(*col)
+        self.can_play(col)
             .then(|| {
                 let row = Row(self.possible_row_in_col(*col));
                 self.play_col(*col);
@@ -34,6 +34,10 @@ where
             self.play(col)?;
         }
         Ok(())
+    }
+
+    pub fn can_play(&self, col: Col<W>) -> bool {
+        self.can_play_col(*col)
     }
 
     pub fn get(&self, col: Col<W>, row: Row<H>) -> Option<Disk> {
@@ -61,7 +65,7 @@ where
 
 impl<const W: usize, const H: usize> std::ops::Deref for Board<W, H>
 where
-    BitBoard<W, H>: AsBitMask,
+    Self: AsBitBoard,
 {
     type Target = BitBoard<W, H>;
 
@@ -72,7 +76,7 @@ where
 
 impl<const W: usize, const H: usize> std::ops::DerefMut for Board<W, H>
 where
-    BitBoard<W, H>: AsBitMask,
+    Self: AsBitBoard,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
@@ -81,7 +85,7 @@ where
 
 impl<const W: usize, const H: usize> fmt::Display for Board<W, H>
 where
-    BitBoard<W, H>: AsBitMask,
+    Self: AsBitBoard,
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for row in (0..H).rev() {

@@ -1,6 +1,6 @@
 use num_traits::AsPrimitive;
 
-use crate::{bit_mask, board::BitBoard, magic::*};
+use crate::{board::Board, magic::*};
 
 #[derive(Debug)]
 pub struct TranspositionTable<const W: usize, const H: usize> {
@@ -38,23 +38,23 @@ impl<const W: usize, const H: usize> TranspositionTable<W, H> {
 
 impl<const W: usize, const H: usize> TranspositionTable<W, H>
 where
-    BitBoard<W, H>: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
-    pub fn get(&self, key: bit_mask!(W, H)) -> Option<i32> {
+    pub fn get(&self, key: BitMask<W, H>) -> Option<i32> {
         let i = self.index(key);
         (self.keys[i] == key.as_())
             .then(|| self.vals[i] as i32)
             .filter(|&v| v != 0)
     }
 
-    pub fn put(&mut self, key: bit_mask!(W, H), val: i8) {
+    pub fn put(&mut self, key: BitMask<W, H>, val: i8) {
         let i = self.index(key);
         self.keys[i] = key.as_();
         self.vals[i] = val;
     }
 
-    fn index(&self, key: bit_mask!(W, H)) -> usize {
-        return <bit_mask!(W, H) as AsPrimitive<usize>>::as_(key) % self.size;
+    fn index(&self, key: BitMask<W, H>) -> usize {
+        return <BitMask<W, H> as AsPrimitive<usize>>::as_(key) % self.size;
     }
 }
 

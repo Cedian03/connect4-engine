@@ -6,7 +6,7 @@ fn run_test_case(path: &str) {
     let file =
         std::fs::read_to_string(&path).expect(&format!("could not read test data from `{path}`"));
 
-    let mut solver = Solver::new();
+    let mut solver = Solver::<7, 6>::new();
 
     for (r, line) in file.lines().enumerate() {
         let mut parts = line.split_ascii_whitespace();
@@ -19,7 +19,7 @@ fn run_test_case(path: &str) {
             .parse()
             .expect("invalid test data; unable to parse expected result");
 
-        let mut board = Board::<7, 6>::new();
+        let mut board = Board::new();
 
         let iter = sequence.chars().map(|ch| {
             ch.try_into().expect(&format!(
@@ -31,7 +31,7 @@ fn run_test_case(path: &str) {
             "invalid move sequence `{sequence}` in {path:?}:{r}"
         ));
 
-        let result = solver.evaluate(&*board);
+        let result = solver.evaluate(&board);
 
         assert_eq!(result, expected);
 

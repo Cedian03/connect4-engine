@@ -3,7 +3,7 @@ use std::io::Read;
 use std::path::Path;
 
 use crate::{
-    board::BitBoard,
+    board::Board,
     error::{Error, Result},
     magic::*,
 };
@@ -18,7 +18,7 @@ pub struct OpeningBook<const W: usize, const H: usize> {
 
 impl<const W: usize, const H: usize> OpeningBook<W, H>
 where
-    BitBoard<W, H>: AsBitMask,
+    Board<W, H>: AsBitBoard,
 {
     pub fn open<P: AsRef<Path>>(path: P) -> Result<Self> {
         let mut f = File::open(path)?;
@@ -73,7 +73,7 @@ where
         })
     }
 
-    pub fn get(&self, p: &BitBoard<W, H>) -> Option<i32> {
+    pub fn get(&self, p: &Board<W, H>) -> Option<i32> {
         (p.half_turn() <= self.depth as i32)
             .then(|| self.table.get(p.key_3()))
             .flatten()
