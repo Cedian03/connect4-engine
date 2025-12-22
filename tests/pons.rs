@@ -1,6 +1,6 @@
 //! Integration tests/benchmarks from Pascal Pons blog
 
-use connect4_engine::{board::Board, solver::Solver};
+use connect4_engine::{Board, Solver};
 
 fn run_test_case(path: &str) {
     let file =
