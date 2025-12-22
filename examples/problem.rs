@@ -2,7 +2,7 @@ use std::io::{self, Write};
 
 use clap::Parser;
 
-use connect4_engine::board::{Board, Col};
+use connect4_engine::{util::char_to_col, Board, Col};
 
 #[derive(Parser)]
 struct Cli {
@@ -17,7 +17,7 @@ fn main() {
     if let Some(opening) = cli.opening {
         let sequence = opening
             .chars()
-            .map(|x| x.try_into().expect("invalid column in opening"));
+            .map(|ch| char_to_col(ch).expect("invalid column in opening"));
 
         board.play_sequence(sequence).expect("invalid opening");
     }
@@ -41,10 +41,9 @@ fn main() {
                 break;
             }
 
-            if let Some(c) = buf.chars().next() {
-                if let Ok(c) = c.try_into() {
-                    if board.can_play(c) {
-                        col = c;
+            if let Some(ch) = buf.chars().next() {
+                if let Some(col) = char_to_col(ch) {
+                    if board.can_play(col) {
                         break;
                     }
                 }
@@ -55,5 +54,3 @@ fn main() {
         }
     }
 }
-
-fn user(board: &Board<7, 6>) -> Col<7> {}

@@ -1,6 +1,6 @@
 //! Integration tests/benchmarks from Pascal Pons blog
 
-use connect4_engine::{Board, Solver};
+use connect4_engine::{util::char_to_col, Board, Solver};
 
 fn run_test_case(path: &str) {
     let file =
@@ -22,7 +22,7 @@ fn run_test_case(path: &str) {
         let mut board = Board::new();
 
         let iter = sequence.chars().map(|ch| {
-            ch.try_into().expect(&format!(
+            char_to_col(ch).expect(&format!(
                 "invalid test data; unable to play column `{ch}` in {path:?}:{r}"
             ))
         });

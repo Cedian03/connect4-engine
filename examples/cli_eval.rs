@@ -2,10 +2,7 @@ use std::time::Instant;
 
 use clap::Parser;
 
-use connect4_engine::{
-    board::BitBoard,
-    solver::{OpeningBook, Solver},
-};
+use connect4_engine::{util::char_to_col, Board, OpeningBook, Solver};
 
 #[derive(Parser)]
 struct Cli {
@@ -18,12 +15,11 @@ struct Cli {
 fn main() {
     let cli = Cli::parse();
 
-    let mut position = BitBoard::standard();
+    let mut board: Board<7, 6> = Board::new();
     if let Some(s) = cli.sequence {
         for (i, ch) in s.char_indices() {
-            position.play_col(
-                char_to_col(&position, ch)
-                    .expect(&format!("invalid column `{ch}` at index {i} of sequence")),
+            board.play_col(
+                char_to_col(ch).expect(&format!("invalid column `{ch}` at index {i} of sequence")),
             );
         }
     }
@@ -34,7 +30,7 @@ fn main() {
     }
 
     let start = Instant::now();
-    let evaluation = solver.evaluate(&position);
+    let evaluation = solver.evaluate(&board);
     let duration = start.elapsed();
 
     println!(
@@ -47,10 +43,4 @@ fn main() {
             .map_or("INFINITE".to_string(), |x| (x * 1000).to_string()),
         evaluation,
     );
-}
-
-fn char_to_col(position: &BitBoard, ch: char) -> Option<usize> {
-    (ch as usize)
-        .checked_sub('A' as usize)
-        .filter(|col| *col < position.width())
 }
