@@ -2,12 +2,13 @@ use std::time::Instant;
 
 use clap::Parser;
 
-use connect4_engine::{util::char_to_col, Board, OpeningBook, Solver};
+use connect4_engine::{DefaultBoard, OpeningBook, Solver};
+
+const OPENING_BOOK_PATH: &str = "./.book";
 
 #[derive(Parser)]
 struct Cli {
-    #[arg(long, short)]
-    sequence: Option<String>,
+    opening: Option<String>,
     #[arg(long)]
     no_book: bool,
 }
@@ -15,32 +16,42 @@ struct Cli {
 fn main() {
     let cli = Cli::parse();
 
-    let mut board: Board<7, 6> = Board::new();
-    if let Some(s) = cli.sequence {
-        for (i, ch) in s.char_indices() {
-            board.play_col(
-                char_to_col(ch).expect(&format!("invalid column `{ch}` at index {i} of sequence")),
-            );
-        }
+    let mut board = DefaultBoard::new();
+    if let Some(opening) = cli.opening {
+        board.try_play_string(&opening).expect("invalid opening");
     }
 
     let mut solver = Solver::new();
     if !cli.no_book {
-        solver = solver.with_book(OpeningBook::open("./.book").expect("missplaced opening book"))
+        solver = solver.with_book(OpeningBook::open(OPENING_BOOK_PATH).expect("invalid book"))
     }
+
+    println!("Evaluating the following position:");
+    println!("{}", board);
 
     let start = Instant::now();
     let evaluation = solver.evaluate(&board);
     let duration = start.elapsed();
 
-    println!(
-        "Searched {} nodes in {:.3?} ({} nodes/s) to get an evaluatiuon of {}!",
+    print!(
+        "Searched {} nodes in {:.3?} ({} nodes/s) to get an evaluation of {}!",
         solver.searched(),
         duration,
         solver
             .searched()
             .checked_div(duration.as_millis() as u64)
-            .map_or("INFINITE".to_string(), |x| (x * 1000).to_string()),
+            .map_or("INFINITE".to_owned(), |x| (x * 1000).to_string()),
         evaluation,
     );
+
+    if evaluation != 0 {
+        let mut winning = board.disk_to_play();
+        if evaluation < 0 {
+            winning = !winning;
+        }
+
+        println!(" That is winning for {}.", winning)
+    } else {
+        println!(" That is a draw.")
+    }
 }
