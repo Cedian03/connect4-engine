@@ -1,6 +1,5 @@
+use crate::board::{magic::*, Board};
 use num_traits::AsPrimitive;
-
-use crate::{board::Board, magic::*};
 
 #[derive(Debug)]
 pub struct TranspositionTable<const W: usize, const H: usize> {

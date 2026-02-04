@@ -1,4 +1,4 @@
-use crate::board::Board;
+use crate::Board;
 
 use super::AsBitBoard;
 

@@ -3,12 +3,11 @@ use std::io::Read;
 use std::path::Path;
 
 use crate::{
-    board::Board,
+    board::{magic::*, Board},
     error::{Error, Result},
-    magic::*,
 };
 
-use super::{table_size, TranspositionTable};
+use super::transposition_table::{table_size, TranspositionTable};
 
 #[derive(Debug)]
 pub struct OpeningBook<const W: usize, const H: usize> {

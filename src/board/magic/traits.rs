@@ -1,8 +1,8 @@
-use std::ops;
+use std::{fmt::Debug, ops};
 
 use num_traits::{AsPrimitive, NumAssign, PrimInt};
 
-use crate::board::Board;
+use crate::Board;
 
 pub type BitMask<const W: usize, const H: usize> = <Board<W, H> as AsBitBoard>::BitMask;
 
@@ -27,7 +27,12 @@ pub trait BitMaskOps:
     + ops::ShlAssign<usize>
     + ops::ShrAssign
     + ops::ShrAssign<usize>
+    + Debug
+    + Default
 {
+    fn is_not_zero(&self) -> bool {
+        !self.is_zero()
+    }
 }
 
 impl BitMaskOps for u8 {}
