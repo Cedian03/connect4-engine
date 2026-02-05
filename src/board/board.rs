@@ -225,8 +225,21 @@ where
     }
 
     pub(crate) fn key_3(&self) -> BitMask<W, H> {
-        let partial = |key: &mut BitMask<W, H>, col: usize| {
-            let mut board = Self::column_top_mask(col);
+        let mut key_forward = <BitMask<W, H>>::from(0);
+        for col in 0..W {
+            self.partial_key_3(&mut key_forward, col);
+        }
+
+        let mut key_reverse = <BitMask<W, H>>::from(0);
+        for col in (0..W).rev() {
+            self.partial_key_3(&mut key_reverse, col);
+        }
+
+        key_forward.min(key_reverse) / <BitMask<W, H>>::from(3)
+    }
+
+    fn partial_key_3(&self, key: &mut BitMask<W, H>, col: usize) {
+        let mut board = Self::column_mask(col) & Self::bottom_mask();
 
             while (board & self.mask).is_not_zero() {
                 *key *= <BitMask<W, H>>::from(3);
@@ -241,29 +254,6 @@ where
             }
 
             *key *= <BitMask<W, H>>::from(3);
-        };
-
-        let mut key_forward = <BitMask<W, H>>::from(0);
-        for col in 0..W {
-            partial(&mut key_forward, col)
-        }
-
-        let mut key_reverse = <BitMask<W, H>>::from(0);
-        for col in (0..W).rev() {
-            partial(&mut key_reverse, col)
-        }
-
-        if key_forward < key_reverse {
-            key_forward / <BitMask<W, H>>::from(3)
-        } else {
-            key_reverse / <BitMask<W, H>>::from(3)
-        }
-    }
-
-    /// Will return nonsense if `col` is not less than `W`.
-    fn column_top_mask(col: usize) -> BitMask<W, H> {
-        Self::debug_assert_column_bound(col);
-        <BitMask<W, H>>::from(1) << (col * (H + 1) + (H - 1))
     }
 
     /// Will return nonsense if `col` is not less than `W` or `row` is not less than `H`.
