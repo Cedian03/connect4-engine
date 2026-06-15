@@ -62,7 +62,7 @@ where
         let mut evals = [None; W];
         for col in 0..W {
             if board.can_play_column(col) {
-                let mut new_board = board.clone();
+                let mut new_board = *board;
                 new_board.play_column(col);
                 let eval = -self.evaluate(&new_board);
                 evals[col] = Some(eval);
@@ -179,7 +179,7 @@ where
         }
 
         for next in moves {
-            let mut new_board = board.clone();
+            let mut new_board = *board;
             new_board.play_mask(next);
             let score = -self.negamax(&new_board, -beta, -alpha);
 
@@ -200,21 +200,6 @@ where
         alpha
     }
 
-    pub fn __foo(&self, board: Board<W, H>) -> String {
-        // self.table
-        //     .get(board.key())
-        //     .or_else(|| self.book.as_ref().and_then(|b| b.get(&board)))
-        //     .is_some()
-
-        if self.table.get(board.key()).is_some() {
-            "In table".to_owned()
-        } else if self.book.as_ref().and_then(|b| b.get(&board)).is_some() {
-            "In book".to_owned()
-        } else {
-            "Not cached".to_owned()
-        }
-    }
-
     fn score(position: &Board<W, H>, mask: BitMask<W, H>) -> u32 {
         Board::<W, H>::compute_winning_cells(position.curr | mask, position.mask).count_ones()
     }
@@ -231,7 +216,7 @@ impl<const W: usize, const H: usize> Default for Solver<W, H> {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub struct MoveSorter<const W: usize, const H: usize>
+struct MoveSorter<const W: usize, const H: usize>
 where
     Board<W, H>: AsBitBoard,
 {

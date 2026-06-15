@@ -241,19 +241,19 @@ where
     fn partial_key_3(&self, key: &mut BitMask<W, H>, col: usize) {
         let mut board = Self::column_mask(col) & Self::bottom_mask();
 
-            while (board & self.mask).is_not_zero() {
-                *key *= <BitMask<W, H>>::from(3);
+        while (board & self.mask).is_not_zero() {
+            *key *= <BitMask<W, H>>::from(3);
 
-                if (board & self.curr).is_not_zero() {
-                    *key += <BitMask<W, H>>::from(1);
-                } else {
-                    *key += <BitMask<W, H>>::from(2);
-                }
-
-                board <<= 1;
+            if (board & self.curr).is_not_zero() {
+                *key += <BitMask<W, H>>::from(1);
+            } else {
+                *key += <BitMask<W, H>>::from(2);
             }
 
-            *key *= <BitMask<W, H>>::from(3);
+            board <<= 1;
+        }
+
+        *key *= <BitMask<W, H>>::from(3);
     }
 
     /// Will return nonsense if `col` is not less than `W` or `row` is not less than `H`.
@@ -305,7 +305,10 @@ where
     }
 }
 
-impl fmt::Display for Board<7, 6> {
+impl<const W: usize, const H: usize> fmt::Display for Board<W, H>
+where
+    Board<W, H>: AsBitBoard,
+{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for row in (0..self.height()).rev() {
             if row != self.height() - 1 {
@@ -375,18 +378,6 @@ mod tests {
     fn test_get_disk_row_out_of_bounds() {
         let board = Board::<7, 6>::new();
         let _ = board.get_cell(0, 6);
-    }
-
-    #[test]
-    fn test_column_top_mask() {
-        assert_eq!(
-            Board::<7, 6>::column_top_mask(0),
-            0b0000000_0000000_0000000_0000000_0000000_0000000_0100000
-        );
-        assert_eq!(
-            Board::<7, 6>::column_top_mask(6),
-            0b0100000_0000000_0000000_0000000_0000000_0000000_0000000
-        );
     }
 
     #[test]

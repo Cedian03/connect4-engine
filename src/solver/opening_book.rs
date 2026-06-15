@@ -34,7 +34,7 @@ where
 
         (width == W)
             .then(|| ())
-            .ok_or(Error::BookOpening("Invaild width".to_string()))?;
+            .ok_or(Error::BookOpening("Invalid width".to_string()))?;
         (height == H)
             .then(|| ())
             .ok_or(Error::BookOpening("Invalid height".to_string()))?;
@@ -76,5 +76,9 @@ where
         (p.half_turn() <= self.depth as i32)
             .then(|| self.table.get(p.key_3()))
             .flatten()
+    }
+
+    pub fn depth(&self) -> usize {
+        self.depth
     }
 }
