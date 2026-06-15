@@ -33,7 +33,8 @@ impl<const W: usize, const H: usize> Solver<W, H> {
     }
 
     pub fn clear(&mut self) {
-        self.table.clear()
+        self.table.clear();
+        self.searched = 0;
     }
 
     const fn column_order() -> [usize; W] {
