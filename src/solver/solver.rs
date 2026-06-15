@@ -72,6 +72,20 @@ where
         evals
     }
 
+    pub fn analyze_weak(&mut self, board: &Board<W, H>) -> [Option<i32>; W] {
+        let mut evals = [None; W];
+        for col in 0..W {
+            if board.can_play_column(col) {
+                let mut new_board = *board;
+                new_board.play_column(col);
+                let eval = -self.evaluate_weak(&new_board);
+                evals[col] = Some(eval);
+            }
+        }
+
+        evals
+    }
+
     pub fn evaluate(&mut self, board: &Board<W, H>) -> i32 {
         if board.can_win_next() {
             return (Self::MAX_DEPTH + 1 - board.half_turn()) / 2;
@@ -80,18 +94,18 @@ where
         let min = -(Self::MAX_DEPTH - board.half_turn()) / 2;
         let max = (Self::MAX_DEPTH + 1 - board.half_turn()) / 2;
 
-        self.fun_name(board, min, max)
+        self.resolve(board, min, max)
     }
 
-    pub fn weak(&mut self, board: &Board<W, H>) -> i32 {
+    pub fn evaluate_weak(&mut self, board: &Board<W, H>) -> i32 {
         if board.can_win_next() {
             return 1;
         }
 
-        self.fun_name(board, -1, 1)
+        self.resolve(board, -1, 1)
     }
 
-    fn fun_name(&mut self, board: &Board<W, H>, mut min: i32, mut max: i32) -> i32 {
+    fn resolve(&mut self, board: &Board<W, H>, mut min: i32, mut max: i32) -> i32 {
         while min < max {
             let mut med = min + (max - min) / 2;
             if med <= 0 && min / 2 < med {
@@ -171,10 +185,10 @@ where
         }
 
         let mut moves = MoveSorter::default();
-        for i in (0..W).rev() {
-            let mask = possible & Board::column_mask(Self::COLUMN_ORDER[i]);
-            if mask != 0.into() {
-                moves.add(mask, Self::score(board, mask));
+        for col in Self::COLUMN_ORDER.into_iter().rev() {
+            let mask = possible & Board::column_mask(col);
+            if mask.is_not_zero() {
+                moves.add(mask, Self::heuristic(board, mask));
             }
         }
 
@@ -200,7 +214,7 @@ where
         alpha
     }
 
-    fn score(position: &Board<W, H>, mask: BitMask<W, H>) -> u32 {
+    fn heuristic(position: &Board<W, H>, mask: BitMask<W, H>) -> u32 {
         Board::<W, H>::compute_winning_cells(position.curr | mask, position.mask).count_ones()
     }
 }

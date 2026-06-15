@@ -137,7 +137,7 @@ where
 
         if forced_moves.is_not_zero() {
             if forced_moves.count_ones() > 1 {
-                return 0.into();
+                return <BitMask<W, H>>::from(0);
             } else {
                 possible_mask = forced_moves;
             }
