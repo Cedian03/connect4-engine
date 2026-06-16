@@ -8,7 +8,7 @@ use connect4_engine::{
 };
 
 const CLEAR: &str = "\x1bc";
-const OPENING_BOOK_PATH: &str = "./.book";
+const OPENING_BOOK_PATH: &str = "./data/opening.book";
 
 #[derive(Parser, Debug, Clone)]
 struct Cli {

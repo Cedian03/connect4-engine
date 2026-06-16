@@ -4,7 +4,7 @@ use clap::Parser;
 
 use connect4_engine::{DefaultBoard, OpeningBook, Solver};
 
-const OPENING_BOOK_PATH: &str = "./.book";
+const OPENING_BOOK_PATH: &str = "./data/opening.book";
 
 #[derive(Parser)]
 struct Cli {
