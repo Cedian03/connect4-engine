@@ -74,7 +74,7 @@ where
 
     pub fn get(&self, p: &Board<W, H>) -> Option<i32> {
         (p.half_turn() <= self.depth as i32)
-            .then(|| self.table.get(p.key_3()))
+            .then(|| self.table.get_u8(p.key_3()))
             .flatten()
     }
 

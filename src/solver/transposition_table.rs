@@ -39,6 +39,14 @@ impl<const W: usize, const H: usize> TranspositionTable<W, H>
 where
     Board<W, H>: AsBitBoard,
 {
+    pub fn get_u8(&self, key: BitMask<W, H>) -> Option<i32> {
+        let i = self.index(key);
+        let key_u8: u8 = key.as_();
+        (self.keys[i] == key_u8 as u32)
+            .then(|| self.vals[i] as i32)
+            .filter(|&v| v != 0)
+    }
+
     pub fn get(&self, key: BitMask<W, H>) -> Option<i32> {
         let i = self.index(key);
         (self.keys[i] == key.as_())
